@@ -48,6 +48,11 @@ def load_houses(filter_options: FilterOptions, max_results: int):
                 elif "town" in h["address"]:
                     city = h["address"]["town"]
 
+            link=""
+            if h["platforms"] is not None and len(h["platforms"]) > 0:
+                if "url" in h["platforms"][0]:
+                    link = h["platforms"][0]["url"]
+
             house = House(
                 id=h["id"],
                 title=h["title"],
@@ -58,7 +63,8 @@ def load_houses(filter_options: FilterOptions, max_results: int):
                 condition=h["condition"],
                 construction_year=h["constructionYear"],
                 region=h["region"],
-                city=city
+                city=city,
+                link=link
             )
             results.append(house)
         except ValidationError as e:

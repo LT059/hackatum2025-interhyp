@@ -1,5 +1,4 @@
 # implemetn pydantic datastructure like in Readme.md
-from enum import Enum
 
 from pydantic.v1 import BaseModel
 from sqlmodel import SQLModel, Field
@@ -16,7 +15,21 @@ class House(SQLModel, table=True):
     condition: str = Field(default="", index=False)
     region: str = Field(default="", index=False)
     city: str = Field(default="", index=False)
+    link: str = Field(default="", index=False)
 
+class HouseResponse(BaseModel):
+    id: str
+    title: str
+    buying_price: int
+    rooms: int
+    square_meter: float
+    image_url: str
+    construction_year: int
+    condition: str
+    region: str
+    city: str
+    link: str
+    finance_duration: str
 
 class FilterOptions(BaseModel):
     max_budget: int

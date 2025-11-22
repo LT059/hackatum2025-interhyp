@@ -8,7 +8,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.app import database
 from backend.app.database import engine
 from backend.app.lib import houses, calculator, models
-from backend.app.lib.models import State, House, ChangeAge
+from backend.app.lib.financing_numbers import optimal_financing
+from backend.app.lib.models import State, House, ChangeAge, HouseResponse
 
 app = FastAPI()
 logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)-8s | "
@@ -93,12 +94,33 @@ def get_houses(state: State, db: Session = Depends(get_db), ):
         LOGGER.info("Region/city not in DB. Accessing API now")
         insert_into_db(state, db)
 
-    return (db.query(models.House)
-            .filter(models.House.region == state.filter_option.region)
-            .filter(models.House.city == state.filter_option.city)
-            .filter(House.buying_price <= state.equity[1])
-            .filter(House.buying_price >= state.equity[0])
-            .limit(MAX_RESULTS_HOUSES).all())
+    result_houses = (db.query(models.House)
+                     .filter(models.House.region == state.filter_option.region)
+                     .filter(models.House.city == state.filter_option.city)
+                     .filter(House.buying_price <= state.equity[1])
+                     .filter(House.buying_price >= state.equity[0])
+                     .limit(MAX_RESULTS_HOUSES).all())
+
+    response = []
+    for h in result_houses:
+        duration = f"Finance: {str(optimal_financing(state=state, house=h))}"
+        house = HouseResponse(
+            id=h.id,
+            title=h.title,
+            buying_price=h.buying_price,
+            rooms=h.rooms,
+            square_meter=h.square_meter,
+            image_url=h.image_url,
+            construction_year=h.construction_year,
+            condition=h.condition,
+            region=h.region,
+            city=h.city,
+            link=h.link,
+            finance_duration=duration,
+        )
+        response.append(house)
+
+    return response
 
 
 @app.on_event("startup")
