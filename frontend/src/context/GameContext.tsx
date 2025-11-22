@@ -305,7 +305,7 @@ function AiStateToBackendState(state: GameState) {
 
 function BackendStateToAiState(backendState: any, aiState: GameState): GameState {
   console.log(2)
-  return {
+  let idk = {
     ...aiState,
     age: backendState.age,
     equity: backendState.equity,
@@ -328,9 +328,11 @@ function BackendStateToAiState(backendState: any, aiState: GameState): GameState
       sortBy: backendState.filter_option.sort_type,
       max_price: backendState.filter_option.max_budget,
       geoSearchQuery: backendState.filter_option.city,
-      region: backendState.region
+      region: backendState.filter_option.region
     },
   }
+  console.log(idk)
+  return idk
 }
 
 
