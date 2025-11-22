@@ -13,7 +13,7 @@ def calculate_equity(mortgage_years: int, state: State):
     session = requests.Session()
 
     data = {
-        "monthlyRate": state.finance.income * state.finance.desired_rates,
+        "monthlyRate": state.finance.income * (state.finance.desired_rates/100.0),
         "equityCash": state.finance.capital,
         "federalState": "DE-BY",
         "amortisation": 1.5,

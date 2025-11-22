@@ -79,7 +79,7 @@ def change_age(request_state: ChangeAge):
     state.finance.capital += state.finance.income * SAVINGS_RATE * 12 * request_state.delta_age
 
     state.equity = [0, 0]
-    state.equity[0] = calculator.calculate_equity(10, state)
+    state.equity[0] = calculator.calculate_equity(5, state)
     state.equity[1] = calculator.calculate_equity(20, state)
     return state
 
