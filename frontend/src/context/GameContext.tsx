@@ -3,6 +3,9 @@
 import type React from "react"
 import { createContext, useContext, useState } from "react"
 import { type House, MOCK_HOUSES, LIFE_EVENTS } from "@/lib/mock-data"
+import { get } from "http"
+import { changeAge as changeAgeApi } from '../api/changeAge';
+import { set } from "react-hook-form"
 
 interface GameState {
   isInitialized: boolean
@@ -54,9 +57,7 @@ interface GameContextType extends GameState {
     savingsRate: number, // Added savingsRate
   ) => void
   changeAge: () => void
-  triggerLifeEvent: () => void
-  submitLifeEvent: (data: LifeEventData) => void
-  resolveChance: (choiceIndex: number) => void
+  changeChance: (data: LifeEventData) => void
   updateFilters: (filters: Partial<GameState["filters"]>) => void
   getHouses: () => void
   restartGame: () => void // Added restartGame
@@ -79,7 +80,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
       savings_rate: 20, // Default savings rate
     },
     houses: MOCK_HOUSES,
-    activeChance: null,
+    activeChance: [],
     filters: {
       type: [],
       sortBy: "asc",
@@ -93,15 +94,15 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
 
   const [userName, setUserName] = useState("")
 
-  const submitLifeEvent = (data: LifeEventData) => {
+  const changeChance = (data: LifeEventData) => {
     setState((prev) => ({
       ...prev,
-      finances: {
-        ...prev.finances,
-        capital: prev.finances.capital - data.oneTimeCost,
-        income: prev.finances.income - data.yearlyCost / 12,
-      },
+      activeChance: [
+        ...prev.activeChance,
+        data
+      ],
     }))
+    getHouses()
   }
 
   const initializeGame = (
@@ -130,54 +131,12 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     }))
   }
 
-  const changeAge = () => {
-    setState((prev) => {
-      const newAge = prev.age + 1
-
-      const annualSavings = prev.finances.income * 12 * (prev.finances.savings_rate / 100)
-      const newCapital = prev.finances.capital + annualSavings
-      const newEquity = newCapital
-
-      // Check if capital crossed €5000 threshold
-      const capitalGained = newCapital - prev.lastSquareCapital
-      const squaresToMove = Math.floor(capitalGained / 5000)
-      const newSquareId = prev.square_id + squaresToMove
-      const newLastSquareCapital =
-        squaresToMove > 0 ? prev.lastSquareCapital + squaresToMove * 5000 : prev.lastSquareCapital
-
-      return {
-        ...prev,
-        age: newAge,
-        square_id: newSquareId,
-        equity: newEquity,
-        finances: { ...prev.finances, capital: newCapital },
-        lastSquareCapital: newLastSquareCapital,
-      }
-    })
+  const changeAge = async (age:Number) => {
+    let old_state = AiStateToBackendState(state);
+    const new_state = await changeAgeApi(age, old_state); // Call backend API to change age
+    setState((prev)=> BackendStateToAiState(new_state,prev) );
   }
 
-  const triggerLifeEvent = () => {
-    const randomEvent = LIFE_EVENTS[Math.floor(Math.random() * LIFE_EVENTS.length)]
-    setState((prev) => ({
-      ...prev,
-      activeChance: randomEvent,
-    }))
-  }
-
-  const resolveChance = (choiceIndex: number) => {
-    if (!state.activeChance) return
-
-    const choice = state.activeChance.options[choiceIndex]
-    setState((prev) => ({
-      ...prev,
-      finances: {
-        ...prev.finances,
-        income: prev.finances.income + (choice.effect.income || 0),
-        capital: prev.finances.capital + (choice.effect.capital || 0),
-      },
-      activeChance: null,
-    }))
-  }
 
   const updateFilters = (newFilters: Partial<GameState["filters"]>) => {
     setState((prev) => ({
@@ -278,11 +237,9 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         userName,
         initializeGame,
         changeAge,
-        triggerLifeEvent,
-        resolveChance,
         updateFilters,
         getHouses,
-        submitLifeEvent,
+        changeChance,
         restartGame, // Exposed restartGame
       }}
     >
@@ -298,3 +255,62 @@ export function useGame() {
   }
   return context
 }
+
+
+// Extrahiert die Daten, die das Backend erwartet
+function AiStateToBackendState(state: GameState) {
+  return {
+    age: state.age,
+    equity: state.equity,
+    square_id: state.square_id,
+    finance: {
+      income: state.finances.income,
+      capital: state.finances.capital,
+      interest_rates: state.finances.interest_rates,
+      desired_rates: state.finances.desired_rates,
+    },
+    filter_option: {
+      max_budget: state.filters.max_price,
+      type: state.filters.type.join(","), // Backend erwartet evtl. String
+      sort_type: state.filters.sortBy,
+      size: 0, // optional, je nach Backend
+      city: state.filters.geoSearchQuery,
+    },
+    chance: state.activeChance?.map(c => ({
+      chance_type: c.type,
+      yearly_cost: c.yearlyCost,
+      onetime_cost: c.oneTimeCost,
+      age: state.age,
+    })) || [],
+  }
+}
+
+function BackendStateToAiState(backendState: any, aiState: GameState): GameState {
+  return {
+    ...aiState,
+    age: backendState.age,
+    equity: backendState.equity,
+    square_id: backendState.square_id,
+    finances: {
+      ...aiState.finances, // behalte local savings_rate
+      income: backendState.finance.income,
+      capital: backendState.finance.capital,
+      interest_rates: backendState.finance.interest_rates,
+      desired_rates: backendState.finance.desired_rates,
+    },
+    activeChance: (backendState.chance || []).map((c: any) => ({
+      type: c.chance_type,
+      oneTimeCost: c.onetime_cost,
+      yearlyCost: c.yearly_cost,
+    })),
+    filters: {
+      ...aiState.filters, // behalte eventuell andere lokale Filter-Einstellungen
+      type: backendState.filter_option.type.split(","),
+      sortBy: backendState.filter_option.sort_type,
+      max_price: backendState.filter_option.max_budget,
+      geoSearchQuery: backendState.filter_option.city,
+    },
+  }
+}
+
+

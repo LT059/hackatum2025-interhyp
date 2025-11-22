@@ -35,7 +35,7 @@ export default function GameContainer() {
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          onClick={changeAge}
+          onClick={() => changeAge(1)}
           className="absolute bottom-10 left-1/2 -translate-x-1/2 px-12 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full font-black text-white uppercase tracking-widest shadow-[0_0_20px_rgba(79,70,229,0.5)] border border-white/20 z-50 hover:shadow-[0_0_40px_rgba(79,70,229,0.8)] transition-all pointer-events-auto"
         >
           Advance Timeline
@@ -57,7 +57,7 @@ function GameDebugger() {
     <div style={{
       position: "fixed",
       bottom: 0,
-      right: 0,
+      left: 0,
       width: "300px",
       maxHeight: isVisible ? "200px" : "30px",
       background: "#111",
@@ -83,7 +83,7 @@ function GameDebugger() {
       >
         {isVisible ? "Hide" : "Show"} Debug
       </button>
-      {isVisible && <pre>{JSON.stringify(game, null, 2)}</pre>}
+      {isVisible && <pre>{JSON.stringify(game.activeChance, null, 2)}</pre>}
     </div>
   )
 }

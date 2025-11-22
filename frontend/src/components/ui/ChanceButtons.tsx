@@ -8,7 +8,7 @@ import { useGame } from "@/context/GameContext"
 import { AlertTriangle, Zap, Car, Baby, Plane, Stethoscope, HelpCircle, X } from "lucide-react"
 
 export default function ChanceButtons() {
-  const { submitLifeEvent } = useGame()
+  const { changeChance } = useGame()
   const [isOpen, setIsOpen] = useState(false)
   const [selectedType, setSelectedType] = useState<string | null>(null)
   const [customName, setCustomName] = useState("")
@@ -27,9 +27,8 @@ export default function ChanceButtons() {
     e.preventDefault()
     if (!selectedType) return
 
-    submitLifeEvent({
-      type: selectedType,
-      customName: selectedType === "other" ? customName : undefined,
+    changeChance({
+      type: selectedType ==="other"? customName: selectedType,
       oneTimeCost: Number(oneTimeCost) || 0,
       yearlyCost: Number(yearlyCost) || 0,
     })

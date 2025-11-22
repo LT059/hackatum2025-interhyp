@@ -1,7 +1,12 @@
+import React from "react";
+
 const API_BASE_URL = import.meta.env.BACKEND_URL;
 const API_URL = `${API_BASE_URL}/change-chance`;
 
-export async function changeChance(chance, state) {
+const {game} = React.useContext(require("../context/GameContext").GameContext);
+
+export async function changeChance(chance) {
+  let state = {age: game.age, equity: game.equity, square_id: game.square_id, filter_options: game.filters, chance: game.activeChance, finance: game.finances};
   try {
     const response = await fetch(API_URL, {
       method: "POST", // send data to backend
