@@ -1,5 +1,5 @@
 import numpy as np
-from calculator import calculate
+from calculator import calculate_equity
 from models import State, Finance, House, FilterOptions
 
 
@@ -9,11 +9,11 @@ def max_min_range(state: State):
     """
 
     min_mortgage_time = 10
-    max_mortgage_time = min(65 - state.square_id, 20)
+    max_mortgage_time = min(65 - state.age, 20)
 
-    return_state = calculate(mortgage_years=max_mortgage_time, state=state)
+    return_state = calculate_equity(mortgage_years=max_mortgage_time, state=state)
     max_net_price = return_state.equity
-    return_state = calculate(mortgage_years=min_mortgage_time, state=state)
+    return_state = calculate_equity(mortgage_years=min_mortgage_time, state=state)
     min_net_price = return_state.equity
 
     return (min_net_price, max_net_price)

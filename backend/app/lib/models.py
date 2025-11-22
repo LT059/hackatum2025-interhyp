@@ -51,7 +51,7 @@ class Finance(BaseModel):
 class State(BaseModel):
     age: int
     # computed equity by the budget calculator
-    equity: int
+    equity: list[int]
     # current location in the game
     square_id: int
     filter_option: FilterOptions
