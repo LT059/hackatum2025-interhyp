@@ -31,6 +31,5 @@ def calculate(mortgage_years: int, state: State, delta_age: int = 0):
     response = response.json()
 
     state.equity = response["scoringResult"]["priceBuilding"]
-    state.equity = response["scoringResult"]["priceBuilding"]
 
     return state
