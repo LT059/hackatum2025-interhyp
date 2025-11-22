@@ -11,7 +11,7 @@ import { printTreeView } from "next/dist/build/utils"
 interface GameState {
   isInitialized: boolean
   age: number
-  equity: number
+  equity: number[]
   square_id: number
   finances: {
     income: number
@@ -72,7 +72,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<GameState>({
     isInitialized: false,
     age: 25,
-    equity: 10000,
+    equity: [],
     square_id: 0,
     finances: {
       income: 3500,
@@ -130,7 +130,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         savings_rate: savingsRate, // Set savings rate
         region: ""
       },
-      equity: capital,
+      equity: [],
       lastSquareCapital: capital,
     }))
   }
@@ -221,7 +221,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     setState({
       isInitialized: false,
       age: 25,
-      equity: 10000,
+      equity: [],
       square_id: 0,
       finances: {
         income: 3500,
