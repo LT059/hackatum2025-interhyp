@@ -23,11 +23,54 @@ export default function InitForm() {
   const monthlySavings = Math.round(income * (savingsRate / 100))
 
   const citiesByRegion: Record<string, string[]> = {
-    Bayern: ["München", "Augsburg", "Nürnberg"],
-    Berlin: ["Berlin"],
-    Hessen: ["Frankfurt", "Wiesbaden", "Darmstadt"],
-    NRW: ["Köln", "Düsseldorf", "Dortmund"],
-  }
+  "Baden-Württemberg": [
+    "Stuttgart", "Karlsruhe", "Mannheim", "Freiburg", "Heidelberg",
+    "Ulm", "Heilbronn", "Pforzheim", "Reutlingen", "Tübingen"
+  ],
+  Bayern: [
+    "München", "Nürnberg", "Augsburg", "Regensburg", "Ingolstadt",
+    "Würzburg", "Erlangen", "Fürth", "Rosenheim", "Passau"
+  ],
+  Berlin: ["Berlin"],
+  Brandenburg: [
+    "Potsdam", "Cottbus", "Brandenburg an der Havel", "Frankfurt (Oder)"
+  ],
+  Bremen: ["Bremen", "Bremerhaven"],
+  Hamburg: ["Hamburg"],
+  Hessen: [
+    "Frankfurt am Main", "Wiesbaden", "Darmstadt", "Kassel",
+    "Offenbach", "Marburg", "Gießen", "Hanau", "Fulda"
+  ],
+  "Mecklenburg-Vorpommern": [
+    "Rostock", "Schwerin", "Neubrandenburg", "Greifswald", "Stralsund"
+  ],
+  Niedersachsen: [
+    "Hannover", "Braunschweig", "Osnabrück", "Oldenburg", "Wolfsburg",
+    "Göttingen", "Hildesheim", "Salzgitter", "Celle"
+  ],
+  "Nordrhein-Westfalen": [
+    "Köln", "Düsseldorf", "Dortmund", "Essen", "Duisburg",
+    "Bochum", "Wuppertal", "Bielefeld", "Bonn", "Münster",
+    "Gelsenkirchen", "Mönchengladbach"
+  ],
+  "Rheinland-Pfalz": [
+    "Mainz", "Ludwigshafen", "Koblenz", "Trier", "Kaiserslautern"
+  ],
+  Saarland: ["Saarbrücken", "Neunkirchen", "Homburg"],
+  Sachsen: [
+    "Leipzig", "Dresden", "Chemnitz", "Zwickau", "Görlitz", "Plauen"
+  ],
+  "Sachsen-Anhalt": [
+    "Magdeburg", "Halle (Saale)", "Dessau-Roßlau", "Wittenberg"
+  ],
+  "Schleswig-Holstein": [
+    "Kiel", "Lübeck", "Flensburg", "Neumünster"
+  ],
+  Thüringen: [
+    "Erfurt", "Jena", "Gera", "Weimar", "Eisenach"
+  ],
+}
+
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
