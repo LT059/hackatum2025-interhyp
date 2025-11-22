@@ -2,23 +2,28 @@
 from enum import Enum
 
 from pydantic.v1 import BaseModel
+from sqlmodel import SQLModel, Field
 
-class House(BaseModel):
-    id: str
-    title: str
-    buying_price: int
-    rooms: int
-    square_meter: int
-    image_url: str
-    construction_year: int
-    condition: str
+
+class House(SQLModel, table=True):
+    id: int = Field(default=None, primary_key=True)
+    title: str = Field(index=True)
+    buying_price: int = Field(index=True)
+    rooms: int = Field(index=False)
+    square_meter: int = Field(index=False)
+    image_url: str = Field(index=False)
+    construction_year: int = Field(index=False)
+    condition: str = Field(index=False)
+    region: str = Field(index=False)
 
 class FilterOptions(BaseModel):
     max_budget: int
+    min_price: int
     type: str
     sort_type: str
     size: int
     city: str
+    region: str
 
     def to_string(self):
         return f"{self.type}|{self.sort_type}|{self.size}|{self.city}"
