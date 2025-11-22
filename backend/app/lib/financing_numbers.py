@@ -1,6 +1,6 @@
 import numpy as np
-from calculator import calculate_equity
-from models import State, Finance, House, FilterOptions
+from backend.app.lib.calculator import calculate_equity
+from backend.app.lib.models import State, Finance, House, FilterOptions, Chance
 
 
 min_mortgage_time = 10
@@ -14,10 +14,8 @@ def max_min_range(state: State):
     min_mortgage_time = 10
     max_mortgage_time = min(65 - state.age, 20)
 
-    return_state = calculate_equity(mortgage_years=max_mortgage_time, state=state)
-    max_net_price = return_state.equity
-    return_state = calculate_equity(mortgage_years=min_mortgage_time, state=state)
-    min_net_price = return_state.equity
+    max_net_price = calculate_equity(mortgage_years=max_mortgage_time, state=state)
+    min_net_price = calculate_equity(mortgage_years=min_mortgage_time, state=state)
 
     return (min_net_price, max_net_price)
 
@@ -95,12 +93,11 @@ def fast_forward_years(range_min: float, range_max: float, state: State) -> int:
 
 if __name__ == "__main__":
 
-    chance_type = ChanceType("child")
-    chance = Chance(chance_type=chance_type, yearly_cost=0, onetime_cost=1000, age=200)
+    chance = Chance(chance_type="child", yearly_cost=0, onetime_cost=1000, age=200)
     house = House(id="10", title="-", buying_price=500000, rooms=2, square_meter=200, image_url="-", construction_year=1984, condition="MINT", region="Bayern")
     finance = Finance(income=10000, capital=100000, interest_rates=4, desired_rates=2000)
     filter_options = FilterOptions(max_budget=50000, type="APARTMENT", sort_type="-", size=100, city="-", region="Bayern")
-    state = State(age=20, equity=2, square_id=20, filter_option=filter_options, chance=[chance], finance=finance)
+    state = State(age=20, equity=[20000], square_id=20, filter_option=filter_options, chance=[chance], finance=finance)
 
     print(chance)
 
