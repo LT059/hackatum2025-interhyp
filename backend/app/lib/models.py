@@ -15,6 +15,7 @@ class House(SQLModel, table=True):
     construction_year: int = Field(default=0, index=False)
     condition: str = Field(default="", index=False)
     region: str = Field(default="", index=False)
+    city: str = Field(default="", index=False)
 
 
 class FilterOptions(BaseModel):
@@ -44,8 +45,8 @@ class Chance(BaseModel):
 class Finance(BaseModel):
     income: int
     capital: int
-    interest_rates: int
-    desired_rates: int
+    interest_rates: float
+    desired_rates: float
 
 
 class State(BaseModel):

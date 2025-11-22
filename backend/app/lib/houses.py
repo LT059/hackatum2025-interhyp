@@ -30,7 +30,8 @@ def load_houses(filter_options: FilterOptions, max_results: int):
     response = session.post(API_URL, json=api_filter)
     session.close()
 
-    LOGGER.info(f"Response from real estate api: {response.status_code}")
+    if response.status_code != 200:
+        LOGGER.error(f"Response from real estate api: {response.status_code} {response.text}")
     response = response.json()
 
     results = []
@@ -39,6 +40,10 @@ def load_houses(filter_options: FilterOptions, max_results: int):
             image_url = ""
             if len(h["images"]) > 0:
                 image_url = h["images"][0]["originalUrl"]
+
+            city=""
+            if h["address"] is not None and "city" in h["address"]:
+                city = h["address"]["city"]
 
             house = House(
                 id=h["id"],
@@ -49,7 +54,8 @@ def load_houses(filter_options: FilterOptions, max_results: int):
                 image_url=image_url,
                 condition=h["condition"],
                 construction_year=h["constructionYear"],
-                region=h["region"]
+                region=h["region"],
+                city=city
             )
             results.append(house)
         except ValidationError as e:

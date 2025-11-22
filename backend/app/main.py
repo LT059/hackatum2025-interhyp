@@ -26,9 +26,9 @@ app.add_middleware(
     allow_origins=origins,
     allow_credentials=True,
     # Erlaube die von dir verwendeten Methoden (POST) und ggf. andere Standardmethoden
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"], 
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     # Erlaube Content-Type, Authorization und alle anderen Standard-Header
-    allow_headers=["*", "Content-Type"], 
+    allow_headers=["*", "Content-Type"],
 )
 
 LOGGER = logging.getLogger("House offers")
@@ -46,8 +46,7 @@ def create_db_and_tables():
     SQLModel.metadata.create_all(engine)
 
 
-@app.post("/initialize-game")
-def initialize(state: State, db: Session = Depends(get_db)):
+def insert_into_db(state: State, db: Session = Depends(get_db)):
     # load 200 listings for the selected region and store them in our database
     house_list = houses.load_houses(state.filter_option, 200)
     for house in house_list:
@@ -58,6 +57,9 @@ def initialize(state: State, db: Session = Depends(get_db)):
         except IntegrityError as e:
             db.rollback()
             LOGGER.info(e)
+
+@app.post("/initialize-game")
+def initialize(state: State, db: Session = Depends(get_db)):
     return state
 
 
@@ -67,9 +69,19 @@ def change_age(delta_age: int, state: State):
 
 
 @app.post("/houses")
-def get_houses(state: State, db: Session = Depends(get_db),):
-    result = db.query(models.House).filter(House.buying_price <= state.filter_option.max_budget).filter(House.buying_price >= state.filter_option.max_budget - MIN_PRICE_DIFF).limit(10).all()
-    return result
+def get_houses(state: State, db: Session = Depends(get_db), ):
+    if (db.query(models.House)
+            .filter(models.House.region == state.filter_option.region)
+            .filter(models.House.city == state.filter_option.city).first()) is None:
+        LOGGER.info("Region/city not in DB. Accessing API now")
+        insert_into_db(state, db)
+
+    return (db.query(models.House)
+        .filter(models.House.region == state.filter_option.region)
+        .filter(models.House.city == state.filter_option.city)
+        .filter(House.buying_price <= state.filter_option.max_budget)
+        .filter(House.buying_price >= state.filter_option.max_budget - MIN_PRICE_DIFF).limit(10).all())
+
 
 @app.on_event("startup")
 def on_startup():
