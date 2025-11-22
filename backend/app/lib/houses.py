@@ -30,7 +30,7 @@ def load_houses(filter_options: FilterOptions, max_results: int):
     response = session.post(API_URL, json=api_filter)
     session.close()
 
-    LOGGER.info(f"Response from real estate api: {response.status_code} {response.text}")
+    LOGGER.info(f"Response from real estate api: {response.status_code}")
     response = response.json()
 
     results = []
@@ -49,13 +49,13 @@ def load_houses(filter_options: FilterOptions, max_results: int):
                 image_url=image_url,
                 condition=h["condition"],
                 construction_year=h["constructionYear"],
+                region=h["region"]
             )
             results.append(house)
         except ValidationError as e:
             LOGGER.info(f"Parsing error, skipping this offer.")
 
     LOGGER.info(f"Fetched {len(results)} real estate offers from API.")
-    print(f"Fetched {len(results)} real estate offers from API.")
     return results
 
 # print(load_houses(FilterOptions(type="APARTMENTBUY", sort_type="publishDate", city="Muenchen", min_price=0, max_budget=10, size=10), max_results=20000))

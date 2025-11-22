@@ -2,6 +2,7 @@ import json
 import logging
 
 from fastapi import FastAPI, Depends
+from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session, SQLModel, select
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -26,6 +27,8 @@ app.add_middleware(
     allow_headers=[""],
 )
 
+LOGGER = logging.getLogger("House offers")
+
 
 def get_db():
     db = database.SessionLocal()
@@ -47,12 +50,16 @@ def load_houses_db(min_price: int, max_price: int, db: Session = Depends(get_db)
 @app.post("/initialize-game")
 def initialize(state: State, db: Session = Depends(get_db)):
     # load 200 listings for the selected region and store them in our database
-    house_list = houses.load_houses(state.filter_option, 200)
+    house_list = houses.load_houses(state.filter_option, 10)
     for house in house_list:
-        db.add(house)
-        db.commit()
-        db.refresh(house)
-    return json.dumps(state)
+        try:
+            db.add(house)
+            db.commit()
+            db.refresh(house)
+        except IntegrityError as e:
+            db.rollback()
+            LOGGER.info(e)
+    return state
 
 
 @app.post("/change-age")
