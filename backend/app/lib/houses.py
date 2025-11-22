@@ -7,15 +7,11 @@ from backend.app.lib.models import FilterOptions, House
 LOGGER = logging.getLogger("House offers")
 API_URL = "https://thinkimmo-api.mgraetz.de/thinkimmo"
 
-cache = {}
 
 
 def load_houses(filter_options: FilterOptions, max_results: int):
 
     LOGGER.info(f"Loading real estate offers for filter options {filter_options}")
-    if filter_options.to_string() in cache:
-        return cache[filter_options.to_string()]
-
     session = requests.Session()
 
     api_filter = {
@@ -58,10 +54,8 @@ def load_houses(filter_options: FilterOptions, max_results: int):
         except ValidationError as e:
             LOGGER.info(f"Parsing error, skipping this offer.")
 
-    if len(cache.keys()) < 10000:
-        cache.update({filter_options.to_string(): results})
     LOGGER.info(f"Fetched {len(results)} real estate offers from API.")
     print(f"Fetched {len(results)} real estate offers from API.")
-    return {"results": results}
+    return results
 
 # print(load_houses(FilterOptions(type="APARTMENTBUY", sort_type="publishDate", city="Muenchen", min_price=0, max_budget=10, size=10), max_results=20000))

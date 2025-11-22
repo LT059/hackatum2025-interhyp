@@ -1,2 +1,2 @@
 /backend/.venv/*
-/backend/houses.db
+/backend/app/houses.db
