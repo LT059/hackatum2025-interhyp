@@ -1,5 +1,5 @@
-const API_BASE_URL = import.meta.env.BACKEND_URL;
-const API_URL = `${API_BASE_URL}/get-houses`;
+const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+const API_URL = `${API_BASE_URL}/houses`;
 
 export async function getHouses(gameState) {
   try {

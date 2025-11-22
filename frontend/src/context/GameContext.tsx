@@ -5,6 +5,7 @@ import { createContext, useContext, useState } from "react"
 import { type House, MOCK_HOUSES, LIFE_EVENTS } from "@/lib/mock-data"
 import { get } from "http"
 import { changeAge as changeAgeApi } from '../api/changeAge';
+import { getHouses as getHousesApi } from '../api/getHouses';
 import { set } from "react-hook-form"
 import { printTreeView } from "next/dist/build/utils"
 
@@ -97,7 +98,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
 
   const [userName, setUserName] = useState("")
 
-  const changeChance = (data: LifeEventData) => {
+  const changeChance = async (data: LifeEventData) => {
     setState((prev) => ({
       ...prev,
       activeChance: [
@@ -105,7 +106,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         data
       ],
     }))
-    getHouses()
+    await getHouses()
   }
 
   const initializeGame = (
@@ -153,15 +154,19 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
 }
 
 
-  const updateFilters = (newFilters: Partial<GameState["filters"]>) => {
+  const updateFilters = async (newFilters: Partial<GameState["filters"]>) => {
     setState((prev) => ({
       ...prev,
       filters: { ...prev.filters, ...newFilters },
     }))
-    getHouses()
+    await getHouses()
   }
 
-  const getHouses = () => {
+  const getHouses = async () => {
+      return await getHousesApi(AiStateToBackendState(state))
+  }
+
+  const getHousesMock = () => {
     let filtered = [...MOCK_HOUSES]
 
     // Filter by type
