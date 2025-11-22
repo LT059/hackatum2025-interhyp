@@ -11,9 +11,6 @@ def max_min_range(state: State):
     Computes the range of displayed houses
     """
 
-    min_mortgage_time = 10
-    max_mortgage_time = min(65 - state.age, 20)
-
     max_net_price = calculate_equity(mortgage_years=max_mortgage_time, state=state)
     min_net_price = calculate_equity(mortgage_years=min_mortgage_time, state=state)
 
@@ -32,7 +29,9 @@ def optimal_financing(state: State, house: House) -> int:
 
     monthly_rate = state.finance.interest_rates / 100 / 12
     loan = brutto_buying_price - state.finance.capital
-    monthly_annuity_payments = state.finance.desired_rates
+    monthly_annuity_payments = state.finance.desired_rates * state.finance.income
+
+    print("Rates", state.finance.desired_rates * state.finance.income)
 
     # compute months needed to pay back above loan
     m = np.log(1/(1-loan*monthly_rate/monthly_annuity_payments))/np.log(1+monthly_rate)
@@ -78,12 +77,12 @@ def fast_forward_years(range_min: float, range_max: float, state: State) -> int:
     monthly_rate = state.finance.interest_rates / 100 / 12
 
     # monthly annuity rate only
-    new_total_loan = state.finance.desired_rates * ((1+monthly_rate)**min_mortgage_time-1)/(monthly_rate*(1+monthly_rate)**min_mortgage_time)
+    new_total_loan = state.finance.desired_rates*state.finance.income * ((1+monthly_rate)**min_mortgage_time-1)/(monthly_rate*(1+monthly_rate)**min_mortgage_time)
 
     # New capital = old_capital + one_time_payements + recurrent_savings
     capital_without_added_savings = state.finance.capital + state.chance[0].onetime_cost
 
-    minimal_time_float = (mid_price - capital_without_added_savings - new_total_loan)/(state.finance.desired_rates*12)
+    minimal_time_float = (mid_price - capital_without_added_savings - new_total_loan)/(state.finance.desired_rates*state.finance.income*12)
 
     # ceiling function and cap to next age
     minimal_fast_forward_time = max(int(minimal_time_float) + 1, 1)
@@ -95,7 +94,7 @@ if __name__ == "__main__":
 
     chance = Chance(chance_type="child", yearly_cost=0, onetime_cost=1000, age=200)
     house = House(id="10", title="-", buying_price=500000, rooms=2, square_meter=200, image_url="-", construction_year=1984, condition="MINT", region="Bayern")
-    finance = Finance(income=10000, capital=100000, interest_rates=4, desired_rates=2000)
+    finance = Finance(income=10000, capital=100000, interest_rates=4, desired_rates=0.2)
     filter_options = FilterOptions(max_budget=50000, type="APARTMENT", sort_type="-", size=100, city="-", region="Bayern")
     state = State(age=20, equity=[20000], square_id=20, filter_option=filter_options, chance=[chance], finance=finance)
 
