@@ -6,7 +6,7 @@
 - chance: chance_type, age (life decisions made at age)
 - chance_type: child, consume (may be extended, controlled change of finances)
 - state: age, equity, square_id, filter_options, chance, finance
-- finance:  income, capital,interest_rates, desired_rates
+- finance:  income, capital,interest_rates, desired_rates, savings_rate
 
 
 ## How to run backend
