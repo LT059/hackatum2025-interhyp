@@ -12,13 +12,17 @@
 ## How to run backend
 Paste these commands into the terminal
 
+```bash
 python3 -m venv .venv
-source .venv/bin/activate  # Unter Windows: .venv\Scripts\activate
+source .venv/bin/activate    # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 uvicorn app.main:app --reload
+```
 
 Find backend under http://127.0.0.1:8000/
 ## How to run frontend
-PAste these commands into the terminal
+Paste these commands into the terminal
+```bash
 npm i
 npm run dev
+```
