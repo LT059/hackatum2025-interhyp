@@ -14,7 +14,7 @@ app = FastAPI()
 logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)-8s | "
                                                "%(module)s:%(funcName)s:%(lineno)d - %(message)s")
 
-MIN_PRICE_DIFF = 100000
+MIN_PRICE_DIFF = 2000000
 MAX_RESULTS_HOUSES = 10
 SAVINGS_RATE = 0.2
 

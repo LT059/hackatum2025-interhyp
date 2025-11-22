@@ -8,9 +8,7 @@ export async function getHouses(gameState) {
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({
-        game_state: gameState
-      })
+      body: JSON.stringify(gameState)
     });
 
     if (!response.ok) {
