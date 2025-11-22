@@ -7,3 +7,18 @@
 - chance_type: child, consume (may be extended, controlled change of finances)
 - state: age, equity, square_id, filter_options, chance, finance
 - finance:  income, capital,interest_rates, desired_rates
+
+
+## How to run backend
+Paste these commands into the terminal
+
+python3 -m venv .venv
+source .venv/bin/activate  # Unter Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload
+
+Find backend under http://127.0.0.1:8000/
+## How to run frontend
+PAste these commands into the terminal
+npm i
+npm run dev
