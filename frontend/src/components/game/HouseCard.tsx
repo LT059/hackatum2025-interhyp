@@ -4,10 +4,13 @@ import { motion } from "framer-motion"
 import Image from "next/image"
 import type { House } from "@/lib/mock-data"
 import { cn } from "@/lib/utils"
-import { DollarSign, Maximize, BedDouble } from "lucide-react"
+import { DollarSign, Maximize, BedDouble, Calendar, ExternalLink } from "lucide-react" // Calendar und ExternalLink hinzugefügt
 
 interface HouseCardProps {
-  house: House
+  house: House & { // Erweiterung der House-Struktur für die neuen Felder
+    finance_duration?: number; // Dauer in Jahren
+    link?: string; // Link zur Immobilie
+  }
   isHighlighted?: boolean
   isActive: boolean
 }
@@ -23,7 +26,7 @@ export default function HouseCard({ house, isHighlighted, isActive }: HouseCardP
       whileHover={isActive ? { scale: 1.05, y: -10 } : {}}
       transition={{ type: "spring", stiffness: 300 }}
     >
-      {/* Header Status */}
+      {/* Header Status - Auskommentiert gelassen */}
       {/* <div className="absolute top-2 right-2 z-20 bg-black/60 px-2 py-1 rounded text-xs text-blue-400 font-mono border border-blue-500/30">
         ID: {house.id}
       </div> */}
@@ -45,27 +48,55 @@ export default function HouseCard({ house, isHighlighted, isActive }: HouseCardP
           {house.title}
         </h3>
 
+        {/* Property Details Grid */}
         <div className="grid grid-cols-2 gap-2 text-sm text-slate-300">
           <div className="flex items-center gap-1">
             <DollarSign className="w-3 h-3 text-blue-500" />
-            <span>{house.buying_price.toLocaleString()}</span>
+            <span>{house.buying_price.toLocaleString()} €</span> {/* Währung hinzugefügt */}
           </div>
           <div className="flex items-center gap-1">
             <Maximize className="w-3 h-3 text-blue-500" />
             <span>{house.squaremeter}m²</span>
           </div>
-          <div className="flex items-center gap-1 col-span-2">
+          <div className="flex items-center gap-1">
             <BedDouble className="w-3 h-3 text-blue-500" />
             <span>{house.rooms} Rooms</span>
           </div>
+          {/* NEUES FELD: Finance Duration */}
+          {house.finance_duration !== undefined && (
+            <div className="flex items-center gap-1">
+              <Calendar className="w-3 h-3 text-blue-500" />
+              <span>{house.finance_duration} Years</span>
+            </div>
+          )}
         </div>
 
-        <p className="text-xs text-slate-400 mt-2 line-clamp-2">{house.description}</p>
-
+        {/* house.description wurde entfernt */}
+        
         {isHighlighted && (
           <div className="mt-auto w-full py-1 bg-green-500/10 border border-green-500/30 text-center text-green-400 text-xs font-bold uppercase tracking-widest animate-pulse rounded">
             Top Match
           </div>
+        )}
+
+        {/* NEUES FELD: Link Button */}
+        {house.link && (
+          <a 
+            href={house.link} 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className={cn(
+                "w-full flex items-center justify-center gap-2 py-2 text-sm font-semibold rounded transition-colors mt-auto",
+                isHighlighted 
+                  ? "bg-green-600 hover:bg-green-500 text-white" 
+                  : "bg-blue-600 hover:bg-blue-500 text-white"
+            )}
+            // Wenn isHighlighted true ist, überschreibt der Link den Top Match und wird zum Button
+            style={{ marginTop: isHighlighted ? '0.5rem' : 'auto' }} 
+          >
+            View Listing
+            <ExternalLink className="w-3 h-3" />
+          </a>
         )}
       </div>
 
