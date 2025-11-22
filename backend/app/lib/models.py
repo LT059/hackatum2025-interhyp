@@ -30,13 +30,9 @@ class FilterOptions(BaseModel):
         return f"{self.type}|{self.sort_type}|{self.size}|{self.city}"
 
 
-class ChanceType(str, Enum):
-    CHILD = "child"
-    CONSUME = "consume"
-
 
 class Chance(BaseModel):
-    chance_type: ChanceType
+    chance_type: str
     yearly_cost: int
     onetime_cost: int
     age: int
@@ -51,7 +47,7 @@ class Finance(BaseModel):
 class State(BaseModel):
     age: int
     # computed equity by the budget calculator
-    equity: int
+    equity: list[int]
     # current location in the game
     square_id: int
     filter_option: FilterOptions

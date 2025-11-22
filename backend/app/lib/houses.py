@@ -18,7 +18,7 @@ def load_houses(filter_options: FilterOptions, max_results: int):
         "active": True,
         "type": filter_options.type,
         "sortBy": "desc",
-        "sortKey": filter_options.sort_type,
+        "sortKey": "publishDate",
         "from": 0,
         "size": max_results,
         "geoSearches": {
@@ -30,7 +30,7 @@ def load_houses(filter_options: FilterOptions, max_results: int):
     response = session.post(API_URL, json=api_filter)
     session.close()
 
-    if response.status_code != 200 or response.status_code != 201:
+    if response.status_code != 200 and response.status_code != 201:
         LOGGER.error(f"Response from real estate api: {response.status_code} {response.text}")
     response = response.json()
 
