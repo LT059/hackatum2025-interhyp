@@ -73,7 +73,7 @@ export default function FilterSidebar() {
                     onClick={() => setIsOpen(true)}
                     className="absolute right-0 top-36 z-30 bg-slate-950/80 border-l border-y border-blue-900/30 py-4 px-1 rounded-l-lg hover:bg-blue-900/20 transition-colors cursor-pointer"
                 >
-                    <div className="writing-vertical-rl text-[10px] font-bold uppercase tracking-widest text-blue-400 rotate-180">
+                    <div className="writing-vertical-rl text-[10px] font-bold uppercase tracking-widest text-blue-400">
                         Filters
                     </div>
                 </button>
