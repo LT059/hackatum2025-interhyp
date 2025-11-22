@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.app import database
 from backend.app.database import engine
 from backend.app.lib import houses, calculator, models
-from backend.app.lib.models import State, House
+from backend.app.lib.models import State, House, ChangeAge
 
 app = FastAPI()
 logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)-8s | "
@@ -65,8 +65,8 @@ def initialize(state: State, db: Session = Depends(get_db)):
 
 
 @app.post("/change-age")
-def change_age(delta_age: int, state: State):
-    return calculator.calculate(delta_age, state)
+def change_age(request_state: ChangeAge):
+    return calculator.calculate(request_state.delta_age, request_state.state)
 
 
 @app.post("/houses")

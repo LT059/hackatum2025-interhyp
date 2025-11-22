@@ -48,7 +48,6 @@ class Finance(BaseModel):
     interest_rates: float
     desired_rates: float
 
-
 class State(BaseModel):
     age: int
     # computed equity by the budget calculator
@@ -58,3 +57,7 @@ class State(BaseModel):
     filter_option: FilterOptions
     chance: list[Chance] | None
     finance: Finance
+
+class ChangeAge(BaseModel):
+    delta_age: int
+    state: State
