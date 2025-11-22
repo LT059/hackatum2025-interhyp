@@ -71,16 +71,18 @@ function Square({ index, offset }: { index: number; offset: number }) {
   const zPos = -offset * 400
   // We move them UP as they go back so they don't just pile at the bottom edge
   const yPos = -offset * 50
-
+  
   return (
     <motion.div
       layout // Use layout animation for smooth position shifts when list changes
       initial={{ opacity: 0, scale: 0.5, z: -5000 }}
       animate={{
-        opacity: offset < 8 ? 1 - offset / 10 : 0, // Fade out
-        scale: 1,
-        z: zPos,
-        y: yPos, // Move up slightly as we go back to create a "floor" effect leading to horizon?
+        rotateX: 30 + 3*offset,
+        opacity: offset < 8 ? 1 - offset / 5 : 0, // Fade out
+        scale: offset===1?1.25:1.3,
+        //x: 700 - offset*50,
+        z: zPos - 100*offset,
+        y: offset === 1?yPos- offset * 650:( offset === 0? yPos - offset * 750 : yPos - offset * 700), // Move up slightly as we go back to create a "floor" effect leading to horizon?
         // Wait, with perspectiveOrigin at bottom, "up" (negative Y) moves AWAY from the vanishing point?
         // No, perspectiveOrigin is the point where parallel lines converge.
         // If we want them to converge to a point, we align them to that point.
@@ -93,7 +95,7 @@ function Square({ index, offset }: { index: number; offset: number }) {
       exit={{
         z: 500, // Move towards camera
         opacity: 0,
-        y: 100, // Drop down
+        y: 500, // Drop down
         transition: { duration: 0.5 },
       }}
       transition={{
@@ -104,6 +106,8 @@ function Square({ index, offset }: { index: number; offset: number }) {
       }}
       className="absolute bottom-0 w-[600px] h-[200px] flex items-center justify-center origin-bottom"
       style={{
+        width: 600,
+        height: offset === 0 ? 350 : 500,
         transformStyle: "preserve-3d",
       }}
     >
