@@ -6,6 +6,7 @@ import { type House, MOCK_HOUSES, LIFE_EVENTS } from "@/lib/mock-data"
 import { get } from "http"
 import { changeAge as changeAgeApi } from '../api/changeAge';
 import { set } from "react-hook-form"
+import { printTreeView } from "next/dist/build/utils"
 
 interface GameState {
   isInitialized: boolean
@@ -56,7 +57,7 @@ interface GameContextType extends GameState {
     desiredRates: number,
     savingsRate: number, // Added savingsRate
   ) => void
-  changeAge: () => void
+  changeAge: (age:number) => Promise<void>
   changeChance: (data: LifeEventData) => void
   updateFilters: (filters: Partial<GameState["filters"]>) => void
   getHouses: () => void
@@ -131,11 +132,22 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     }))
   }
 
-  const changeAge = async (age:Number) => {
+  const changeAge = async (age: number) => {
+  console.log("debug: changeAge gestartet...");
+  try {
     let old_state = AiStateToBackendState(state);
-    const new_state = await changeAgeApi(age, old_state); // Call backend API to change age
-    setState((prev)=> BackendStateToAiState(new_state,prev) );
+    console.log("debug: alter State für Backend:", old_state);
+
+    const new_state = await changeAgeApi(age, old_state); // <-- Wahrscheinlichster Fehlerpunkt
+
+    console.log("debug: neuen State vom Backend erhalten:", new_state);
+    setState((prev) => BackendStateToAiState(new_state, prev));
+
+  } catch (error) {
+    // HIER siehst du den Fehler, der von changeAgeApi geworfen wird
+    console.error("Fehler beim Aufrufen von changeAgeApi:", error); 
   }
+}
 
 
   const updateFilters = (newFilters: Partial<GameState["filters"]>) => {
@@ -259,6 +271,7 @@ export function useGame() {
 
 // Extrahiert die Daten, die das Backend erwartet
 function AiStateToBackendState(state: GameState) {
+  console.log(1)
   return {
     age: state.age,
     equity: state.equity,
@@ -286,6 +299,7 @@ function AiStateToBackendState(state: GameState) {
 }
 
 function BackendStateToAiState(backendState: any, aiState: GameState): GameState {
+  console.log(2)
   return {
     ...aiState,
     age: backendState.age,

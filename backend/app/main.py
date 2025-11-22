@@ -15,16 +15,18 @@ app = FastAPI()
 logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)-8s | "
                                                "%(module)s:%(funcName)s:%(lineno)d - %(message)s")
 origins = [
-    "http://localhost:3000/",
-    "http://127.0.0.1:3000/",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
 ]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=[""],
-    allow_headers=[""],
+    # Erlaube die von dir verwendeten Methoden (POST) und ggf. andere Standardmethoden
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"], 
+    # Erlaube Content-Type, Authorization und alle anderen Standard-Header
+    allow_headers=["*", "Content-Type"], 
 )
 
 LOGGER = logging.getLogger("House offers")

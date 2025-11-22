@@ -2,7 +2,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 const API_URL = `${API_BASE_URL}/change-age`;
 
 export async function changeAge(age, gameState) {
-    print(API_URL)
+    console.log(API_URL)
   try {
     const response = await fetch(API_URL, {
       method: "POST", // sending data to backend
@@ -11,7 +11,7 @@ export async function changeAge(age, gameState) {
       },
       body: JSON.stringify({
         age: age,
-        game_state: {gameState}
+        game_state: gameState
       })
     });
 
