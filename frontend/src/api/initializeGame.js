@@ -1,7 +1,7 @@
 const API_BASE_URL = import.meta.env.BACKEND_URL;
 const API_URL = `${API_BASE_URL}/initialize-game`;
 
-export async function initializeGame(income, capital, interest_rates, desired_rates) {
+export async function initializeGame(income, capital, interest_rates, desired_rates, region) {
   try {
     // Send input data to backend
     const response = await fetch(API_URL, {

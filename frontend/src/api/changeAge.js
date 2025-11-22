@@ -10,8 +10,8 @@ export async function changeAge(age, gameState) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        age: age,
-        game_state: gameState
+        delta_age: age,
+        state: gameState
       })
     });
 

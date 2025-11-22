@@ -17,6 +17,7 @@ export default function InitForm() {
   const [interestRates, setInterestRates] = useState(3.5)
   const [desiredRates, setDesiredRates] = useState(7.0)
   const [savingsRate, setSavingsRate] = useState(20) // Added savingsRate state
+  const [Region, setRegion] = useState("Bayern") // Added savingsRate state
 
   const monthlySavings = Math.round(income * (savingsRate / 100))
 

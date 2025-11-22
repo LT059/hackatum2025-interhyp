@@ -83,7 +83,7 @@ function GameDebugger() {
       >
         {isVisible ? "Hide" : "Show"} Debug
       </button>
-      {isVisible && <pre>{JSON.stringify(game.activeChance, null, 2)}</pre>}
+      {isVisible && <pre>{JSON.stringify(game, null, 2)}</pre>}
     </div>
   )
 }

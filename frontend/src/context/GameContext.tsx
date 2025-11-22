@@ -36,6 +36,7 @@ interface GameState {
     min_price: number
     max_price: number
     geoSearchQuery: string
+    region: string
   }
   lastSquareCapital: number
 }
@@ -89,6 +90,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
       min_price: 0,
       max_price: 2000000,
       geoSearchQuery: "",
+      region: "",
     },
     lastSquareCapital: 10000,
   })
@@ -126,6 +128,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         interest_rates: interestRates,
         desired_rates: desiredRates,
         savings_rate: savingsRate, // Set savings rate
+        region: ""
       },
       equity: capital,
       lastSquareCapital: capital,
@@ -236,6 +239,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         min_price: 0,
         max_price: 2000000,
         geoSearchQuery: "",
+        region: "",
       },
       lastSquareCapital: 10000,
     })
@@ -288,6 +292,7 @@ function AiStateToBackendState(state: GameState) {
       sort_type: state.filters.sortBy,
       size: 0, // optional, je nach Backend
       city: state.filters.geoSearchQuery,
+      region: state.filters.region,
     },
     chance: state.activeChance?.map(c => ({
       chance_type: c.type,
@@ -323,6 +328,7 @@ function BackendStateToAiState(backendState: any, aiState: GameState): GameState
       sortBy: backendState.filter_option.sort_type,
       max_price: backendState.filter_option.max_budget,
       geoSearchQuery: backendState.filter_option.city,
+      region: backendState.region
     },
   }
 }
