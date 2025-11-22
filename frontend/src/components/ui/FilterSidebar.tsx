@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useGame } from "@/context/GameContext"
 import { motion } from "framer-motion"
 import {
@@ -16,8 +16,13 @@ import {
 } from "lucide-react"
 
 export default function FilterSidebar() {
-    const { filters, updateFilters } = useGame()
+    const { filters, updateFilters, getHouses } = useGame()
     const [isOpen, setIsOpen] = useState(false)
+    const [cityInput, setCityInput] = useState("")
+
+    useEffect(() => {
+        getHouses()
+    }, [filters])
 
     const propertyTypes = [
         { value: "APPARTMENTBUY", label: "Apt", icon: Building2 },
@@ -54,8 +59,14 @@ export default function FilterSidebar() {
     ]
 
     const toggleType = (type: string) => {
-        const newTypes = filters.type.includes(type) ? filters.type.filter((t) => t !== type) : [...filters.type, type]
+        const newTypes = filters.type.includes(type)
+            ? filters.type.filter((t) => t !== type)
+            : [...filters.type, type]
         updateFilters({ type: newTypes })
+    }
+
+    const submitCity = () => {
+        updateFilters({ city: cityInput })
     }
 
     return (
@@ -168,22 +179,21 @@ export default function FilterSidebar() {
                         </select>
                     </div>
 
-                    <div className="space-y-3">
-                        <div className="flex justify-between items-end">
-                            <h3 className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Max Budget</h3>
-                            <span className="text-[10px] font-mono text-blue-400 bg-blue-950/50 px-1.5 py-0.5 rounded border border-blue-900">
-                €{(filters.max_price / 1000000).toFixed(1)}M
-              </span>
-                        </div>
+                    {/* City Input */}
+                    <div className="space-y-2">
+                        <h3 className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">City</h3>
                         <input
-                            type="range"
-                            min="100000"
-                            max="2000000"
-                            step="50000"
-                            value={filters.max_price}
-                            onChange={(e) => updateFilters({ max_price: Number(e.target.value) })}
-                            className="w-full accent-blue-500 h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer"
+                            value={cityInput}
+                            onChange={(e) => setCityInput(e.target.value)}
+                            placeholder="Enter city..."
+                            className="w-full pl-3 pr-2 py-2 bg-slate-900/50 border border-slate-800 text-slate-300 text-xs rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
                         />
+                        <button
+                            onClick={submitCity}
+                            className="w-full py-2 text-[11px] bg-blue-600/30 border border-blue-700 rounded-lg text-blue-200 hover:bg-blue-600/40 transition"
+                        >
+                            Apply City
+                        </button>
                     </div>
                 </div>
             </motion.div>

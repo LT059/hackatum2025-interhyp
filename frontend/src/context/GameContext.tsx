@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { createContext, useContext, useState, useEffect } from "react"
-import { type House, MOCK_HOUSES } from "@/lib/mock-data"
+import { type House} from "@/lib/mock-data"
 import { changeAge as changeAgeApi } from '../api/changeAge';
 import { getHouses as getHousesApi } from '../api/getHouses';
 
@@ -33,7 +33,7 @@ interface GameState {
             | "pricePerSqm"
         min_price: number
         max_price: number
-        geoSearchQuery: string
+        city: string
         region: string
     }
     lastSquareCapital: number
@@ -87,7 +87,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
             sortKey: "buyingPrice",
             min_price: 0,
             max_price: 2000000,
-            geoSearchQuery: "",
+            city: "",
             region: "",
         },
         lastSquareCapital: 10000,
@@ -197,7 +197,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
                 sortKey: "buyingPrice",
                 min_price: 0,
                 max_price: 2000000,
-                geoSearchQuery: "",
+                city: "",
                 region: "",
             },
             lastSquareCapital: 10000,
@@ -255,7 +255,7 @@ function AiStateToBackendState(state: GameState) {
             type: state.filters.type.join(","),
             sort_type: state.filters.sortBy,
             size: 0,
-            city: state.filters.geoSearchQuery,
+            city: state.filters.city,
             region: state.filters.region,
         },
         chance: state.activeChance?.map(c => ({
@@ -312,7 +312,7 @@ function BackendStateToAiState(backendState: any, aiState: GameState): GameState
             type: backendState.filter_option.type.split(","),
             sortBy: backendState.filter_option.sort_type,
             max_price: backendState.filter_option.max_budget,
-            geoSearchQuery: backendState.filter_option.city,
+            city: backendState.filter_option.city,
             region: backendState.filter_option.region,
         },
     }
