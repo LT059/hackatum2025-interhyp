@@ -1,0 +1,1 @@
+# implemetn pydantic datastructure like in Readme.md
