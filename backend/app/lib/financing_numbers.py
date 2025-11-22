@@ -29,9 +29,9 @@ def optimal_financing(state: State, house: House) -> int:
 
     monthly_rate = state.finance.interest_rates / 100 / 12
     loan = brutto_buying_price - state.finance.capital
-    monthly_annuity_payments = state.finance.desired_rates * state.finance.income
+    monthly_annuity_payments = (state.finance.desired_rates/100) * state.finance.income
 
-    print("Rates", state.finance.desired_rates * state.finance.income)
+    print("Rates", (state.finance.desired_rates/100) * state.finance.income)
 
     # compute months needed to pay back above loan
     m = np.log(1/(1-loan*monthly_rate/monthly_annuity_payments))/np.log(1+monthly_rate)

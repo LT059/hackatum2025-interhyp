@@ -280,12 +280,14 @@ function BackendHousesToFrontend(backendHouses: any) {
         rooms: backendHouses.rooms,
         squaremeter: backendHouses.square_meter,
         image_url: backendHouses.image_url,
-        description: "Some nice real estate.",
+        description: backendHouses.link,
         publishDate: "1999-12-31",
         rentPricePerSqm: 0,
         grossReturn: 0,
         constructionYear: backendHouses.construction_year,
         pricePerSqm: 0,
+        link: backendHouses.link,
+        finance_duration: backendHouses.finance_duration,
     }
 }
 

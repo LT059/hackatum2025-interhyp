@@ -103,7 +103,7 @@ def get_houses(state: State, db: Session = Depends(get_db), ):
 
     response = []
     for h in result_houses:
-        duration = f"Finance: {str(optimal_financing(state=state, house=h))}"
+        duration = f"Paid off in {str(optimal_financing(state=state, house=h))}"
         house = HouseResponse(
             id=h.id,
             title=h.title,
