@@ -8,12 +8,12 @@ LOGGER = logging.getLogger("Calculator")
 URL = "https://www.interhyp.de/customer-generation/budget/calculateMaxBuyingPower"
 
 
-def calculate_equity(mortgage_years: int, state: State, delta_age: int = 0):
+def calculate_equity(mortgage_years: int, state: State):
     LOGGER.info(f"Calculating maximum affordable real estate value for state {state}")
     session = requests.Session()
 
     data = {
-        "monthlyRate": state.finance.desired_rates,
+        "monthlyRate": state.finance.income * state.finance.desired_rates,
         "equityCash": state.finance.capital,
         "federalState": "DE-BY",
         "amortisation": 1.5,
