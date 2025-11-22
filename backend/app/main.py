@@ -79,13 +79,14 @@ def change_age(request_state: ChangeAge):
     state.finance.capital += state.finance.income * SAVINGS_RATE * 12 * request_state.delta_age
 
     state.equity = [0, 0]
-    state.equity[0] = calculator.calculate_equity(5, state)
-    state.equity[1] = calculator.calculate_equity(20, state)
+    state.equity[0] = calculator.calculate_equity(10, state)
+    state.equity[1] = calculator.calculate_equity(25, state)
     return state
 
 
 @app.post("/houses")
 def get_houses(state: State, db: Session = Depends(get_db), ):
+    # temp_result =
     if (db.query(models.House)
             .filter(models.House.region == state.filter_option.region)
             .filter(models.House.city == state.filter_option.city).first()) is None:
