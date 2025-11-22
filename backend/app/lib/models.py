@@ -19,7 +19,6 @@ class House(SQLModel, table=True):
 
 class FilterOptions(BaseModel):
     max_budget: int
-    min_price: int
     type: str
     sort_type: str
     size: int

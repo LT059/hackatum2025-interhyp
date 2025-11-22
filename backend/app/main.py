@@ -13,6 +13,9 @@ from backend.app.lib.models import State, House
 app = FastAPI()
 logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)-8s | "
                                                "%(module)s:%(funcName)s:%(lineno)d - %(message)s")
+
+MIN_PRICE_DIFF = 100000
+
 origins = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
@@ -65,7 +68,7 @@ def change_age(delta_age: int, state: State):
 
 @app.post("/houses")
 def get_houses(state: State, db: Session = Depends(get_db),):
-    result = db.query(models.House).filter(House.buying_price <= state.filter_option.max_budget).filter(House.buying_price >= state.filter_option.min_price).limit(10).all()
+    result = db.query(models.House).filter(House.buying_price <= state.filter_option.max_budget).filter(House.buying_price >= state.filter_option.max_budget - MIN_PRICE_DIFF).limit(10).all()
     return result
 
 @app.on_event("startup")
