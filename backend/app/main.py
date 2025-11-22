@@ -8,12 +8,12 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from backend.app import database
 from backend.app.database import engine
-from backend.app.lib import houses, calculator
+from backend.app.lib import houses, calculator, models
 from backend.app.lib.models import State, House
 
 app = FastAPI()
-logging.basicConfig(level=logging.DEBUG, format="%(asctime)s | %(levelname)-8s | "
-                                                "%(module)s:%(funcName)s:%(lineno)d - %(message)s")
+logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)-8s | "
+                                               "%(module)s:%(funcName)s:%(lineno)d - %(message)s")
 origins = [
     "http://localhost:3000/",
     "http://127.0.0.1:3000/",
@@ -42,15 +42,10 @@ def create_db_and_tables():
     SQLModel.metadata.create_all(engine)
 
 
-def load_houses_db(min_price: int, max_price: int, db: Session = Depends(get_db), ):
-    return db.exec(
-        select(House).where(House.buying_price <= max_price, House.buying_price >= min_price).limit(5))
-
-
 @app.post("/initialize-game")
 def initialize(state: State, db: Session = Depends(get_db)):
     # load 200 listings for the selected region and store them in our database
-    house_list = houses.load_houses(state.filter_option, 10)
+    house_list = houses.load_houses(state.filter_option, 200)
     for house in house_list:
         try:
             db.add(house)
@@ -68,10 +63,9 @@ def change_age(delta_age: int, state: State):
 
 
 @app.post("/houses")
-def get_houses(state: State):
-    return load_houses_db(min_price=state.filter_option.min_price,
-                          max_price=state.filter_option.max_budget)
-
+def get_houses(state: State, db: Session = Depends(get_db),):
+    result = db.query(models.House).filter(House.buying_price <= state.filter_option.max_budget).filter(House.buying_price >= state.filter_option.min_price).limit(10).all()
+    return result
 
 @app.on_event("startup")
 def on_startup():
