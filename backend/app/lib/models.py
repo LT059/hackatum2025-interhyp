@@ -17,12 +17,14 @@ class FilterOptions(BaseModel):
     size: int
     city: str
 
-class ChanceType(BaseModel, Enum):
-    CHILD = 0
-    CONSUME = 1
+class ChanceType(str, Enum):
+    CHILD = "child"
+    CONSUME = "consume"
 
 class Chance(BaseModel):
     chance_type: ChanceType
+    yearly_cost: int
+    onetime_cost: int
     age: int
 
 class Finance(BaseModel):
@@ -38,3 +40,4 @@ class State(BaseModel):
     square_id: int
     filter_option: FilterOptions
     chance: Chance
+    finance: Finance

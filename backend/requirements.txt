@@ -1,5 +1,5 @@
 # backend/requirements.txt
-fastapi
+fastapi[standard]
 uvicorn[standard]
 pydantic
 requests
