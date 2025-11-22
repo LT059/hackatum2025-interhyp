@@ -55,7 +55,7 @@ export default function HouseCarousel() {
 
         {/* Fake Button */}
         <div className="mt-6 px-6 py-2 bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-bold uppercase tracking-widest rounded">
-          Awaiting Listings - fuck off!
+          Awaiting Listings!
         </div>
       </motion.div>
     </div>
