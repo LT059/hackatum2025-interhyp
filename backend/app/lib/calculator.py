@@ -2,7 +2,7 @@ import logging
 
 import requests
 
-from models import State
+from backend.app.lib.models import State
 
 LOGGER = logging.getLogger("Calculator")
 URL = "https://www.interhyp.de/customer-generation/budget/calculateMaxBuyingPower"

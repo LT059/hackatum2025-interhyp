@@ -1,9 +1,8 @@
-import json
 import logging
 
 from fastapi import FastAPI, Depends
 from sqlalchemy.exc import IntegrityError
-from sqlmodel import Session, SQLModel, select
+from sqlmodel import Session, SQLModel
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.app import database
