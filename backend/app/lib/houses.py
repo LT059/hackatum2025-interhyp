@@ -30,7 +30,7 @@ def load_houses(filter_options: FilterOptions, max_results: int):
     response = session.post(API_URL, json=api_filter)
     session.close()
 
-    if response.status_code != 200:
+    if response.status_code != 200 or response.status_code != 201:
         LOGGER.error(f"Response from real estate api: {response.status_code} {response.text}")
     response = response.json()
 
@@ -42,8 +42,11 @@ def load_houses(filter_options: FilterOptions, max_results: int):
                 image_url = h["images"][0]["originalUrl"]
 
             city=""
-            if h["address"] is not None and "city" in h["address"]:
-                city = h["address"]["city"]
+            if h["address"] is not None:
+                if "city" in h["address"]:
+                    city = h["address"]["city"]
+                elif "town" in h["address"]:
+                    city = h["address"]["town"]
 
             house = House(
                 id=h["id"],

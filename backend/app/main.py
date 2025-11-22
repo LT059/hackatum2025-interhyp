@@ -15,6 +15,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)-8s | 
                                                "%(module)s:%(funcName)s:%(lineno)d - %(message)s")
 
 MIN_PRICE_DIFF = 100000
+MAX_RESULTS_HOUSES = 10
 
 origins = [
     "http://localhost:3000",
@@ -80,7 +81,7 @@ def get_houses(state: State, db: Session = Depends(get_db), ):
         .filter(models.House.region == state.filter_option.region)
         .filter(models.House.city == state.filter_option.city)
         .filter(House.buying_price <= state.filter_option.max_budget)
-        .filter(House.buying_price >= state.filter_option.max_budget - MIN_PRICE_DIFF).limit(10).all())
+        .filter(House.buying_price >= state.filter_option.max_budget - MIN_PRICE_DIFF).limit(MAX_RESULTS_HOUSES).all())
 
 
 @app.on_event("startup")
