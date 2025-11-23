@@ -55,7 +55,7 @@ export default function HouseCard({ house, isActive }: HouseCardProps) {
         <motion.div
             className={cn(
                 "w-[300px] h-[420px] bg-slate-900/80 backdrop-blur-md rounded-xl border border-slate-700 overflow-hidden flex flex-col relative",
-                isActive ? "opacity-100 scale-100 z-10" : "opacity-60 scale-90 z-0 grayscale",
+                isActive ? "opacity-100 scale-100 z-10" : "opacity-100 scale-90 z-0 grayscale",
             )}
             onHoverStart={() => isActive && setIsHovering(true)}
             onHoverEnd={() => isActive && setIsHovering(false)}

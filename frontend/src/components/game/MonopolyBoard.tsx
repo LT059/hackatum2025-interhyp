@@ -136,7 +136,7 @@ function Square({ index, offset }: { index: number; offset: number }) {
           <span
             className={`text-5xl font-black tracking-tighter ${offset === 0 ? "text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.8)]" : "text-slate-600"}`}
           >
-            {index}
+            {index + " years"} 
           </span>
         </div>
 

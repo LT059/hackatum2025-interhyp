@@ -1,25 +1,68 @@
 "use client"
 
-import { useState } from "react"
+import { useState,useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { useGame } from "@/context/GameContext"
 import HouseCard from "./HouseCard"
 
 export default function HouseCarousel() {
-  const { houses, finances } = useGame()
+  const { houses, finances, equity } = useGame()
   const [activeIndex, setActiveIndex] = useState(0)
 
-  // added 22 Nov - 23.42
-  /*
-  if (!houses || houses.length === 0) {
-  return (
-    <div className="w-full h-[600px] flex items-center justify-center text-xl text-white">
-      No houses found 🏠❌
-    </div>
-  )
-}
-*/
+const [isInitialLoad, setIsInitialLoad] = useState(true);
+
+    // 2. Zustand, der prüft, ob die Backend-Daten noch fehlen
+    const isDataMissing = equity.length === 0 && (houses === null || houses.length === 0);
+
+    // 3. useEffect für den 5-Sekunden-Timeout
+    useEffect(() => {
+        if (isDataMissing) {
+            // Setzt einen Timer, der isInitialLoad nach 5000ms auf false setzt
+            const timer = setTimeout(() => {
+                setIsInitialLoad(false);
+            }, 5000);
+
+            // Cleanup-Funktion: Löscht den Timer, falls die Daten vorher geladen werden
+            return () => clearTimeout(timer);
+        } else {
+            // Wenn die Daten geladen sind, beenden wir den Initial Load sofort
+            setIsInitialLoad(false);
+        }
+    }, [isDataMissing]); // Abhängigkeit von isDataMissing
+
+    // WICHTIGE PRÜFUNG: Zeige den Ladebildschirm nur, wenn Daten fehlen UND der Timer noch läuft.
+    if (isDataMissing && isInitialLoad) {
+        return (
+            // h-fit oder keine Höhenangabe, um 'wrap-content' zu simulieren
+            <div className="w-full flex items-center justify-center p-8 bg-gray-900">
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.5 }}
+                    // Entfernung der festen Höhe, p-6 für kompakten Look
+                    className="flex flex-col items-center justify-center p-6 rounded-xl bg-slate-900/80 backdrop-blur-md border border-purple-500/30 shadow-2xl h-fit"
+                >
+                    <motion.div
+                        className="w-10 h-10 border-4 border-t-4 border-t-purple-500 border-b-purple-500/50 border-r-purple-500/50 border-l-purple-500/50 rounded-full"
+                        animate={{ rotate: 360 }}
+                        transition={{
+                            repeat: Infinity,
+                            duration: 1.5,
+                            ease: "linear",
+                        }}
+                    />
+                    <h2 className="mt-4 text-lg font-semibold tracking-wider text-purple-400 uppercase">
+                        Crunching Data Just For You
+                    </h2>
+                    <p className="text-xs text-slate-400 mt-1">
+                        Calculating equity and fetching relevant listings...
+                    </p>
+                </motion.div>
+            </div>
+        );
+    }
+
   if (!houses || houses.length === 0) {
   return (
     <div className="w-full h-[600px] flex items-center justify-center">
