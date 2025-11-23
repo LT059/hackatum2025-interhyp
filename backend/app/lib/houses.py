@@ -53,11 +53,15 @@ def load_houses(filter_options: FilterOptions, max_results: int):
                 if "url" in h["platforms"][0]:
                     link = h["platforms"][0]["url"]
 
+            rooms=""
+            if "rooms" in h:
+                rooms = h["rooms"]
+
             house = House(
                 id=h["id"],
                 title=h["title"],
                 buying_price=h["buyingPrice"],
-                rooms=h["rooms"],
+                rooms=rooms,
                 square_meter=h["squareMeter"],
                 image_url=image_url,
                 condition=h["condition"],
