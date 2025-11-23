@@ -59,7 +59,7 @@ interface GameContextType extends GameState {
     changeAge: (age:number) => Promise<void>
     changeChance: (data: LifeEventData) => Promise<void>
     updateFilters: (filters: Partial<GameState["filters"]>) => Promise<void>
-    getHouses: () => Promise<House[]>
+    getHouses: () => House[]
     restartGame: () => Promise<void>
     userName: string
 }
@@ -100,7 +100,6 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
             ...prev,
             activeChance: [...(prev.activeChance || []), data],
         }))
-        await getHouses()
     }
 
     const initializeGame = async (
@@ -128,21 +127,6 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
             equity: [],
             lastSquareCapital: capital,
         }))
-
-        // Houses nach Initialisierung laden
-        const backendHouses = await getHousesApi(AiStateToBackendState({
-            ...state,
-            age,
-            finances: {
-                income,
-                capital,
-                interest_rates: interestRates,
-                desired_rates: desiredRates,
-                savings_rate: savingsRate,
-            },
-            isInitialized: true
-        }))
-        setState((prev) => ({ ...prev, houses: houseToArray(backendHouses) }))
     }
 
 
@@ -164,7 +148,6 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
             ...prev,
             filters: { ...prev.filters, ...newFilters },
         }))
-        //await getHouses()
     }
 
     const getHouses = async () => {
@@ -204,10 +187,6 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         }
 
         await setState(initialState)
-
-        // Houses nach Reset laden
-        const backendHouses = await getHousesApi(AiStateToBackendState(initialState))
-        setState((prev) => ({ ...prev, houses: houseToArray(backendHouses) }))
     }
 
 
