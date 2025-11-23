@@ -17,9 +17,9 @@ def max_min_range(state: State):
     return (min_net_price, max_net_price)
 
 
-def optimal_financing(state: State, house: House) -> int:
+def optimal_financing(state: State, house: House) -> float:
     """
-    Computes optimal financing duration in months consuming all of your accumulated capital and setting mthly saving rate to annuity payments
+    Computes optimal financing duration in years consuming all of your accumulated capital and setting mthly saving rate to annuity payments
     """
     
     regional_tax = property_tax_list()
@@ -66,12 +66,14 @@ def property_tax_list():
 
     return property_tax
 
-def fast_forward_years(range_min: float, range_max: float, state: State) -> int:
+def fast_forward_years(state: State) -> int:
     """
     Method to compute that years needed to unlock new class
     """
-
-    mid_price = (range_min + range_max)/2
+    if state.equity == []:
+        return 0
+    
+    mid_price = (state.equity[0] + state.equity[1])/2
 
     # Current state
     monthly_rate = state.finance.interest_rates / 100 / 12
@@ -92,17 +94,17 @@ def fast_forward_years(range_min: float, range_max: float, state: State) -> int:
 
 if __name__ == "__main__":
 
-    chance = Chance(chance_type="child", yearly_cost=0, onetime_cost=1000, age=200)
-    house = House(id="10", title="-", buying_price=500000, rooms=2, square_meter=200, image_url="-", construction_year=1984, condition="MINT", region="Bayern")
-    finance = Finance(income=10000, capital=100000, interest_rates=4, desired_rates=0.2)
+    chance = Chance(chance_type="child", yearly_cost=0, onetime_cost=1000, age=20)
+    house = House(id="10", title="-", buying_price=409000, rooms=2, square_meter=200, image_url="-", construction_year=1984, condition="MINT", region="Bayern")
+    finance = Finance(income=5000, capital=260000, interest_rates=3.5, desired_rates=0.2)
     filter_options = FilterOptions(max_budget=50000, type="APARTMENT", sort_type="-", size=100, city="-", region="Bayern")
-    state = State(age=20, equity=[20000], square_id=20, filter_option=filter_options, chance=[chance], finance=finance)
+    state = State(age=20, equity=[150000, 250000], square_id=20, filter_option=filter_options, chance=[chance], finance=finance)
 
     print(chance)
 
     opt_year = optimal_financing(state=state, house=house)
     range_min, range_max = max_min_range(state)
-    ff_years = fast_forward_years(range_min=range_min, range_max=range_max, state=state)
+    ff_years = fast_forward_years(state=state)
 
     print(f"Optimal investment window {opt_year}")
     print(f"Current investment range {range_min}, {range_max}")

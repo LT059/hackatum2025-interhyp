@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.app import database
 from backend.app.database import engine
 from backend.app.lib import houses, calculator, models
-from backend.app.lib.financing_numbers import optimal_financing
+from backend.app.lib.financing_numbers import optimal_financing, fast_forward_years
 from backend.app.lib.models import State, House, ChangeAge, HouseResponse
 
 app = FastAPI()
@@ -26,7 +26,7 @@ origins = [
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     # Erlaube die von dir verwendeten Methoden (POST) und ggf. andere Standardmethoden
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
@@ -69,6 +69,10 @@ def initialize(state: State, db: Session = Depends(get_db)):
 
 @app.post("/change-age")
 def change_age(request_state: ChangeAge):
+
+    if request_state.delta_age == -1:
+        request_state.delta_age = fast_forward_years(request_state.state)
+    
     state = request_state.state
     state.age += request_state.delta_age
 
