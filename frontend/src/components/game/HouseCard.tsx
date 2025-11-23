@@ -5,8 +5,8 @@ import Image from "next/image"
 import { useState, useRef } from "react"
 import type { House } from "@/lib/mock-data"
 import { cn } from "@/lib/utils"
-// Clock für die Finanzierungsdauer hinzugefügt, Calendar für das Baujahr beibehalten
-import { DollarSign, Maximize, BedDouble, Calendar, ExternalLink, Clock } from "lucide-react" 
+// Importiere das Herz-Icon für den Like-Button
+import { DollarSign, Maximize, BedDouble, Calendar, ExternalLink, Clock, Heart } from "lucide-react" 
 
 interface HouseCardProps {
     house: House & { 
@@ -20,9 +20,12 @@ interface HouseCardProps {
 
 export default function HouseCard({ house, isActive }: HouseCardProps) {
     const [isHovering, setIsHovering] = useState(false)
+    // Neuer State für den Like-Button
+    const [isLiked, setIsLiked] = useState(false) 
     const containerRef = useRef<HTMLDivElement>(null)
     const titleRef = useRef<HTMLHeadingElement>(null)
 
+    // Logik für die Marquee-Animation (unverändert)
     const getAnimationDistance = () => {
         if (!containerRef.current || !titleRef.current) return 0
         
@@ -51,6 +54,12 @@ export default function HouseCard({ house, isActive }: HouseCardProps) {
         },
     }
 
+    // Funktion zum Umschalten des Like-Status
+    const handleLikeToggle = (e: React.MouseEvent) => {
+        e.stopPropagation(); // Verhindert, dass das whileHover der Card ausgelöst wird
+        setIsLiked(prev => !prev);
+    }
+
     return (
         <motion.div
             className={cn(
@@ -66,6 +75,20 @@ export default function HouseCard({ house, isActive }: HouseCardProps) {
             <div className="relative h-48 w-full bg-slate-800 border-b border-slate-700">
                 <Image src={house.image_url || "/placeholder.svg"} alt={house.title} fill className="object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent" />
+                
+                {/* 💖 LIKE BUTTON (NEU) */}
+                {(
+                    <motion.button
+                        className={cn(
+                            "absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-colors shadow-lg z-20",
+                            isLiked ? "bg-red-500 hover:bg-red-600 text-white" : "bg-slate-700/70 hover:bg-slate-600/90 text-slate-300"
+                        )}
+                        onClick={handleLikeToggle}
+                        whileTap={{ scale: 1.2, rotate: isLiked ? 360 : 0 }} // Animation beim Klicken
+                    >
+                        <Heart className="w-4 h-4" fill={isLiked ? "white" : "none"} />
+                    </motion.button>
+                )}
             </div>
 
             {/* Content */}
@@ -100,7 +123,7 @@ export default function HouseCard({ house, isActive }: HouseCardProps) {
                         <span>{house.squaremeter}m²</span>
                     </div>
                     
-                    {/* Baujahr (NEU) */}
+                    {/* Baujahr */}
                     {house.constructionYear !== 0 && (
                         <div className="flex items-center gap-1">
                             <Calendar className="w-3 h-3 text-blue-500" />
@@ -114,10 +137,9 @@ export default function HouseCard({ house, isActive }: HouseCardProps) {
                         <span>{house.rooms} Rooms</span>
                     </div>
                     
-                    {/* Finance Duration (Angepasst) */}
+                    {/* Finance Duration */}
                     {house.finance_duration !== undefined && (
                         <div className="flex items-center justify-center gap-1 col-span-2 py-1 px-2 border border-slate-700 bg-slate-800/50 rounded-md mt-1">
-                            {/* Icon zu Clock geändert */}
                             <Clock className="w-3 h-3 text-blue-400" /> 
                             <span className="text-xs font-semibold text-slate-300">
                                 Mortgage Duration {house.finance_duration} Years
@@ -143,7 +165,7 @@ export default function HouseCard({ house, isActive }: HouseCardProps) {
                 )}
             </div>
 
-            {/* Decorative Corners */}
+            {/* Decorative Corners (unverändert) */}
             <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-blue-500" />
             <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-blue-500" />
             <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-blue-500" />
