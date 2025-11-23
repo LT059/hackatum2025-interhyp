@@ -105,7 +105,7 @@ export default function HouseCard({ house, isActive }: HouseCardProps) {
                             "text-xl font-bold uppercase tracking-wider text-blue-400",
                             "whitespace-nowrap inline-block",
                         )}
-                        animate={isHovering ? "animate" : "initial"}
+                        animate={isActive ? "animate" : "initial"}
                         variants={titleVariants}
                     >
                         {house.title}
