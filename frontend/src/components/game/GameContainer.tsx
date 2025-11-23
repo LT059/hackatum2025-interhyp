@@ -10,13 +10,38 @@ import { motion } from "framer-motion"
 import MonopolyBoard from "./MonopolyBoard"
 import OnboardingGuide from "../ui/OnboardingGuide"
 import { useState } from "react"
-import { ChevronRight } from "lucide-react" // Icons für die Buttons hinzugefügt
+import { ChevronRight } from "lucide-react" 
+
+// Definiere die Cooldown-Dauer (in Millisekunden)
+const COOLDOWN_DURATION = 1 // 1.5 Sekunden
 
 export default function GameContainer() {
     const { isInitialized, changeAge } = useGame()
+    // Füge den State für den Cooldown hinzu
+    const [isCoolingDown, setIsCoolingDown] = useState(false)
 
     if (!isInitialized) {
         return <InitForm />
+    }
+
+    // Neue Funktion zur Handhabung des Klicks mit Cooldown
+    const handleAdvanceAge = async (deltaAge: number) => {
+        if (isCoolingDown) return
+
+        // 1. Cooldown starten
+        setIsCoolingDown(true)
+
+        try {
+            // 2. Aktion ausführen
+            await changeAge(deltaAge)
+        } catch (error) {
+            console.error("Fehler bei changeAge:", error)
+        } finally {
+            // 3. Cooldown nach der definierten Dauer beenden
+            setTimeout(() => {
+                setIsCoolingDown(false)
+            }, COOLDOWN_DURATION)
+        }
     }
 
     return (
@@ -36,17 +61,21 @@ export default function GameContainer() {
                     
                     {/* 1. Advance Timeline (Hauptaktion) */}
                     <motion.button
+                        // 🛑 Deaktiviert den Button, wenn isCoolingDown true ist
+                        disabled={isCoolingDown} 
                         whileHover={{ scale: 1.05, y: -2 }}
                         whileTap={{ scale: 0.95 }}
-                        onClick={() => changeAge(1)}
-                        className="flex items-center gap-2 px-12 py-3 bg-gradient-to-r from-blue-500 to-indigo-700 rounded-full font-black text-white uppercase tracking-widest text-sm shadow-[0_0_20px_rgba(79,70,229,0.7)] border border-white/30 hover:shadow-[0_0_40px_rgba(79,70,229,1)] transition-all"
+                        // Ruft die neue Cooldown-Funktion auf
+                        onClick={() => handleAdvanceAge(1)}
+                           className="flex items-center gap-2 px-12 py-3 bg-gradient-to-r from-blue-500 to-indigo-700 rounded-full font-black text-white uppercase tracking-widest text-sm shadow-[0_0_20px_rgba(79,70,229,0.7)] border border-white/30 hover:shadow-[0_0_40px_rgba(79,70,229,1)] transition-all"
                     >
                         Advance 1 Year
                         <ChevronRight size={16} />
                     </motion.button>
 
-                    {/* 2. Fast Forward (Sekundär-/Debug-Aktion: Zurückspulen) */}
+                    {/* 2. Fast Forward (Sekundär-/Debug-Aktion) */}
                     <motion.button
+                        disabled={isCoolingDown}
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => changeAge(5)}
