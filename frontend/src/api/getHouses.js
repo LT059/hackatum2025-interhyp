@@ -20,7 +20,7 @@ export async function getHouses(gameState) {
 
     const houses = await response.json();
 
-    console.log("Houses received:", houses);
+    //console.log("Houses received:", houses);
 
     renderHouses(houses);
 

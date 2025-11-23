@@ -41,7 +41,7 @@ export default function GameContainer() {
                         onClick={() => changeAge(1)}
                         className="flex items-center gap-2 px-12 py-3 bg-gradient-to-r from-blue-500 to-indigo-700 rounded-full font-black text-white uppercase tracking-widest text-sm shadow-[0_0_20px_rgba(79,70,229,0.7)] border border-white/30 hover:shadow-[0_0_40px_rgba(79,70,229,1)] transition-all"
                     >
-                        Advance One Year
+                        Advance 1 Year
                         <ChevronRight size={16} />
                     </motion.button>
 
@@ -49,11 +49,11 @@ export default function GameContainer() {
                     <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        onClick={() => changeAge(-1)}
+                        onClick={() => changeAge(5)}
                         // Konturiertes, subtileres Design
                         className="flex items-center gap-2 px-8 py-2 bg-transparent border border-blue-600 rounded-full font-bold text-blue-300 uppercase tracking-wide text-[10px] shadow-[0_0_10px_rgba(37,99,235,0.3)] hover:bg-blue-900/20 hover:text-white transition-all"
                     >
-                        Fast Forward
+                        Fast Forward 5 years
                         <ChevronRight size={14} />
                     </motion.button>
                 </div>

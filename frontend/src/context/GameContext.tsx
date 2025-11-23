@@ -6,6 +6,10 @@ import { type House} from "@/lib/mock-data"
 import { changeAge as changeAgeApi } from '../api/changeAge';
 import { getHouses as getHousesApi } from '../api/getHouses';
 
+interface AgeStateCache{
+    state: GameState | null
+} ;
+
 interface GameState {
     isInitialized: boolean
     age: number
@@ -21,7 +25,7 @@ interface GameState {
     houses: House[]
     activeChance: any[] | null
     filters: {
-        type: string[]
+        type: string
         sortBy: "desc" | "asc"
         sortKey:
             | "buyingPrice"
@@ -82,7 +86,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         houses: [], // leer initialisieren
         activeChance: [],
         filters: {
-            type: [],
+            type: "",
             sortBy: "asc",
             sortKey: "buyingPrice",
             min_price: 0,
@@ -92,6 +96,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         },
         lastSquareCapital: 10000,
     })
+    const [stateCache, setStateCache] = useState<AgeStateCache>({state: null})
 
     const [userName, setUserName] = useState("")
 
@@ -130,18 +135,123 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     }
 
 
-    const changeAge = async (age: number) => {
-        try {
-            const old_state = AiStateToBackendState(state)
-            const new_state = await changeAgeApi(age, old_state)
-            setState((prev) => BackendStateToAiState(new_state, prev))
-            const backendHouses = await getHousesApi(AiStateToBackendState(state))
-            setState((prev) => ({ ...prev, houses: houseToArray(backendHouses) }))
+    // ... inside GameProvider component
 
+    const prefetchNextAgeState = async (currentState: GameState) => {
+        try {
+            // 1. Hole den Zustand für das nächste Alter (currentState.age + 1) vom Backend
+            const backendState = AiStateToBackendState(currentState); 
+            // Die Änderung um 1 Jahr wird hier explizit durchgeführt, da wir das nächste Alter vorab laden
+            const next_age_state = await changeAgeApi(1, backendState);
+            
+            // 2. Transformiere den Backend-Zustand in den Frontend-Zustand
+            // Wir nutzen den aktuellen Zustand (currentState) als Basis für die Transformation
+            const next_ai_state = BackendStateToAiState(next_age_state, currentState);
+            
+            // 3. Hole die Häuser basierend auf dem zukünftigen Zustand (next_ai_state)
+            const backendHouses: any[] = await getHousesApi(AiStateToBackendState(next_ai_state));
+            const frontendHouses = houseToArray(backendHouses);
+
+            // 4. Setze den Cache mit dem vollständig aktualisierten Zustand
+            setStateCache({
+                state: { 
+                    ...next_ai_state,
+                    houses: frontendHouses,
+                }
+            });
+            console.log("Prefetched state for age", next_ai_state.age);
         } catch (error) {
-            console.error("Fehler beim Aufrufen von changeAgeApi:", error)
+            console.error("Fehler beim Prefetching:", error);
+            // Bei Fehler den Cache zurücksetzen, um keine fehlerhaften Daten zu nutzen
+            setStateCache({ state: null }); 
         }
     }
+
+    const changeAge = async (delta_age: number) => {
+        console.log("debug", state, stateCache)
+        
+        const isCacheValid = 
+            stateCache.state !== null && 
+            delta_age === 1 && 
+            stateCache.state.age === state.age + 1 &&
+            stateCache.state.activeChance?.length === state.activeChance?.length && 
+            // Wichtig: Prüfen, ob Filter gleich sind, um unnötige/falsche Cache-Hits zu vermeiden
+            stateCache.state.filters.sortBy === state.filters.sortBy && 
+            stateCache.state.filters.sortKey === state.filters.sortKey && 
+            stateCache.state.filters.max_price === state.filters.max_price && 
+            stateCache.state.filters.city === state.filters.city && 
+            stateCache.state.filters.region === state.filters.region;
+
+        if (isCacheValid) {
+            // Cache Hit: Den vorgehaltenen Zustand für das aktuelle Update nutzen
+            console.log("Cache hit for age", state.age, "->", stateCache.state!.age);
+            const nextStateFromCache = stateCache.state!;
+            
+            // 1. Aktuellen Zustand setzen
+            setState(nextStateFromCache);
+            
+            // 2. Den Cache für den DARAUF FOLGENDEN Schritt vorab laden (neues prefetching)
+            // Wir verwenden den Zustand, den wir gerade aus dem Cache geholt haben, als Basis für den nächsten Prefetch
+            await prefetchNextAgeState(nextStateFromCache);
+
+        } else {
+            // Cache Miss oder delta_age != 1: Regulären API-Aufruf durchführen
+            console.log("Cache miss/Direct Age Change for age", state.age);
+            setStateCache({ state: null }); // Cache invalidieren, da wir es überspringen oder einen anderen delta_age haben
+
+            try {
+                const old_state = AiStateToBackendState(state)
+                const new_backend_state = await changeAgeApi(delta_age, old_state)
+
+                // 1. Transformiere und setze den aktuellen Zustand basierend auf Backend-Antwort
+                const new_ai_state = BackendStateToAiState(new_backend_state, state);
+                
+                // 2. Hole Häuser für den NEUEN Zustand
+                const backendHouses :any[] = await getHousesApi(AiStateToBackendState(new_ai_state))
+                const frontendHouses = houseToArray(backendHouses)
+                
+                // 3. Setze den endgültigen Zustand
+                setState(() => ({ 
+                    ...new_ai_state, 
+                    houses: frontendHouses 
+                }));
+                
+                // 4. Den Cache für das nächste Alter (age + 1) nachladen, 
+                //    aber nur, wenn wir gerade um 1 Jahr gesprungen sind, 
+                //    um nicht unnötig zu prefetch-en.
+                if (delta_age === 1) {
+                    await prefetchNextAgeState({ ...new_ai_state, houses: frontendHouses });
+                }
+
+            } catch (error) {
+                console.error("Fehler beim Aufrufen von changeAgeApi:", error)
+            }
+        }
+    }
+    useEffect(() => {
+        // Führe das Prefetching aus, wenn sich state.filters oder state.activeChance ändert
+        // oder direkt nach der Initialisierung (da state.age sich ändert oder state.isInitialized auf true gesetzt wird)
+        
+        // Wir übergeben den aktuellen 'state' an die Prefetch-Funktion
+        if (state.isInitialized) prefetchNextAgeState(state);
+        
+        // Abhängigkeiten:
+        // state.age: Löst Prefetch nach jedem erfolgreichen changeAge aus.
+        // state.filters: Löst Prefetch aus, wenn der Benutzer die Filter ändert.
+        // state.activeChance.length: Löst Prefetch aus, wenn eine neue Chance hinzugefügt/entfernt wird.
+        // state.isInitialized: Löst Prefetch nach der ersten Initialisierung aus.
+    }, [
+        state.age, 
+        state.isInitialized,
+        state.filters.type,
+        state.filters.sortBy,
+        state.filters.sortKey,
+        state.filters.min_price,
+        state.filters.max_price,
+        state.filters.city,
+        state.filters.region,
+        state.activeChance?.length, // Nur die Länge prüfen ist ein guter Kompromiss
+    ]);
 
     const updateFilters = async (newFilters: Partial<GameState["filters"]>) => {
         await setState((prev) => ({
@@ -175,7 +285,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
             houses: [],
             activeChance: [],
             filters: {
-                type: [],
+                type: "",
                 sortBy: "asc",
                 sortKey: "buyingPrice",
                 min_price: 0,
@@ -231,7 +341,7 @@ function AiStateToBackendState(state: GameState) {
         },
         filter_option: {
             max_budget: state.filters.max_price,
-            type: state.filters.type.join(","),
+            type: state.filters.type,
             sort_type: state.filters.sortBy,
             size: 0,
             city: state.filters.city,
@@ -254,7 +364,7 @@ function BackendHousesToFrontend(backendHouses: any) {
     return {
         id: backendHouses.id,
         title: backendHouses.title,
-        type: "real estate",
+        type: backendHouses.type,
         buying_price: backendHouses.buying_price,
         rooms: backendHouses.rooms,
         squaremeter: backendHouses.square_meter,
