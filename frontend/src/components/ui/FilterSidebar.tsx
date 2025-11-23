@@ -1,11 +1,10 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react" // useCallback hinzugefügt
 import { useGame } from "@/context/GameContext"
 import { motion } from "framer-motion"
 import {
     SlidersHorizontal,
-    Search,
     Home,
     Building,
     Building2,
@@ -15,15 +14,76 @@ import {
     ChevronLeft,
 } from "lucide-react"
 
+// Stadt-Datenbank (vom Ende des ursprünglichen Codes hierher verschoben)
+const citiesByRegion: Record<string, string[]> = {
+    "Baden-Württemberg": ["Stuttgart", "Karlsruhe", "Mannheim", "Freiburg", "Heidelberg", "Ulm", "Heilbronn", "Pforzheim", "Reutlingen", "Tübingen"],
+    Bayern: ["München", "Nürnberg", "Augsburg", "Regensburg", "Ingolstadt", "Würzburg", "Erlangen", "Fürth", "Rosenheim", "Passau"],
+    Berlin: ["Berlin"],
+    Brandenburg: ["Potsdam", "Cottbus", "Brandenburg an der Havel", "Frankfurt (Oder)"],
+    Bremen: ["Bremen", "Bremerhaven"],
+    Hamburg: ["Hamburg"],
+    Hessen: ["Frankfurt am Main", "Wiesbaden", "Darmstadt", "Kassel", "Offenbach", "Marburg", "Gießen", "Hanau", "Fulda"],
+    "Mecklenburg-Vorpommern": ["Rostock", "Schwerin", "Neubrandenburg", "Greifswald", "Stralsund"],
+    Niedersachsen: ["Hannover", "Braunschweig", "Osnabrück", "Oldenburg", "Wolfsburg", "Göttingen", "Hildesheim", "Salzgitter", "Celle"],
+    "Nordrhein-Westfalen": ["Köln", "Düsseldorf", "Dortmund", "Essen", "Duisburg", "Bochum", "Wuppertal", "Bielefeld", "Bonn", "Münster", "Gelsenkirchen", "Mönchengladbach"],
+    "Rheinland-Pfalz": ["Mainz", "Ludwigshafen", "Koblenz", "Trier", "Kaiserslautern"],
+    Saarland: ["Saarbrücken", "Neunkirchen", "Homburg"],
+    Sachsen: ["Leipzig", "Dresden", "Chemnitz", "Zwickau", "Görlitz", "Plauen"],
+    "Sachsen-Anhalt": ["Magdeburg", "Halle (Saale)", "Dessau-Roßlau", "Wittenberg"],
+    "Schleswig-Holstein": ["Kiel", "Lübeck", "Flensburg", "Neumünster"],
+    Thüringen: ["Erfurt", "Jena", "Gera", "Weimar", "Eisenach"]
+}
+
+// Liste der Bundesländer (keys von citiesByRegion)
+const germanStates = Object.keys(citiesByRegion);
+
 export default function FilterSidebar() {
+    // Hole Filter und Update-Funktion aus dem Context
     const { filters, updateFilters, getHouses } = useGame()
     const [isOpen, setIsOpen] = useState(false)
-    const [cityInput, setCityInput] = useState("")
+    // const [cityInput, setCityInput] = useState("") // Nicht mehr benötigt
 
+    // useEffect zum Abrufen der Häuser, wenn sich die Filter ändern.
+    // Die Abhängigkeit 'getHouses' sollte mit useCallback im Context umschlossen werden, 
+    // um unnötiges Neuladen zu vermeiden, wenn sie sich oft ändert. 
+    // Hier wird davon ausgegangen, dass 'getHouses' stabil ist.
     useEffect(() => {
         getHouses()
-    }, [filters])
+    }, [filters, getHouses])
 
+    // Hilfsfunktion zur Behandlung der Regionsänderung
+    const handleRegionChange = useCallback((newRegion: string) => {
+        // Wenn keine Region (All Germany) gewählt ist, wird die Stadt auch zurückgesetzt.
+        if (!newRegion) {
+            updateFilters({ region: "", city: "" });
+            return;
+        }
+
+        const availableCities = citiesByRegion[newRegion];
+        let newCity = filters.city;
+
+        // Wenn die aktuell gewählte Stadt nicht in der neuen Region existiert, 
+        // wird die Stadt auf die erste Stadt der neuen Region oder auf "" gesetzt.
+        if (!availableCities.includes(filters.city)) {
+            newCity = availableCities[0] || "";
+        }
+        
+        updateFilters({ region: newRegion, city: newCity });
+    }, [filters.city, updateFilters]);
+
+    // Hilfsfunktion zur Behandlung der Stadtänderung
+    const handleCityChange = useCallback((newCity: string) => {
+        updateFilters({ city: newCity });
+    }, [updateFilters]);
+
+    const toggleType = (type: string) => {
+        const newTypes = filters.type.includes(type)
+            ? filters.type.filter((t) => t !== type)
+            : [...filters.type, type]
+        updateFilters({ type: newTypes })
+    }
+
+    // ... (propertyTypes und sortOptions bleiben unverändert)
     const propertyTypes = [
         { value: "APPARTMENTBUY", label: "Apt", icon: Building2 },
         { value: "HOUSEBUY", label: "House", icon: Home },
@@ -38,36 +98,7 @@ export default function FilterSidebar() {
         { value: "rentPricePerSqm", label: "Rent" },
         { value: "grossReturn", label: "Return" },
     ]
-
-    const germanStates = [
-        "Baden-Württemberg",
-        "Bayern",
-        "Berlin",
-        "Brandenburg",
-        "Bremen",
-        "Hamburg",
-        "Hessen",
-        "Mecklenburg-Vorpommern",
-        "Niedersachsen",
-        "Nordrhein-Westfalen",
-        "Rheinland-Pfalz",
-        "Saarland",
-        "Sachsen",
-        "Sachsen-Anhalt",
-        "Schleswig-Holstein",
-        "Thüringen",
-    ]
-
-    const toggleType = (type: string) => {
-        const newTypes = filters.type.includes(type)
-            ? filters.type.filter((t) => t !== type)
-            : [...filters.type, type]
-        updateFilters({ type: newTypes })
-    }
-
-    const submitCity = () => {
-        updateFilters({ city: cityInput })
-    }
+    // ...
 
     return (
         <>
@@ -160,14 +191,16 @@ export default function FilterSidebar() {
                         </div>
                     </div>
 
+                    {/* LOCATION FELDER (ANGEPASST) */}
                     <div className="space-y-3">
                         <h3 className="text-[10px] text-slate-500 uppercase font-bold tracking-wider flex items-center gap-2">
                             Location
                             <span className="h-px flex-1 bg-slate-800"></span>
                         </h3>
+                        {/* Region Select (Bundesland) */}
                         <select
                             value={filters.region}
-                            onChange={(e) => updateFilters({ region: e.target.value })}
+                            onChange={(e) => handleRegionChange(e.target.value)}
                             className="w-full pl-3 pr-2 py-2.5 bg-slate-900/50 border border-slate-800 text-slate-300 text-xs rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all"
                         >
                             <option value="">All Germany</option>
@@ -177,23 +210,30 @@ export default function FilterSidebar() {
                                 </option>
                             ))}
                         </select>
-                    </div>
-
-                    {/* City Input */}
-                    <div className="space-y-2">
-                        <h3 className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">City</h3>
-                        <input
-                            value={cityInput}
-                            onChange={(e) => setCityInput(e.target.value)}
-                            placeholder="Enter city..."
-                            className="w-full pl-3 pr-2 py-2 bg-slate-900/50 border border-slate-800 text-slate-300 text-xs rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
-                        />
-                        <button
-                            onClick={submitCity}
-                            className="w-full py-2 text-[11px] bg-blue-600/30 border border-blue-700 rounded-lg text-blue-200 hover:bg-blue-600/40 transition"
-                        >
-                            Apply City
-                        </button>
+                        
+                        {/* City Select (Dynamisch basierend auf Region) */}
+                        <div className="space-y-2">
+                            <h3 className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">City</h3>
+                            {filters.region && citiesByRegion[filters.region] ? (
+                                <select
+                                    value={filters.city}
+                                    onChange={(e) => handleCityChange(e.target.value)}
+                                    className="w-full pl-3 pr-2 py-2.5 bg-slate-900/50 border border-slate-800 text-slate-300 text-xs rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all"
+                                >
+                                    {/* Option zum Zurücksetzen der Stadt */}
+                                    <option value="">All Cities in {filters.region}</option> 
+                                    {citiesByRegion[filters.region].map((city) => (
+                                        <option key={city} value={city}>
+                                            {city}
+                                        </option>
+                                    ))}
+                                </select>
+                            ) : (
+                                <div className="text-xs text-slate-600 p-2 border border-slate-800 rounded-lg bg-slate-900/50">
+                                    Please select a region first to filter by city.
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             </motion.div>
