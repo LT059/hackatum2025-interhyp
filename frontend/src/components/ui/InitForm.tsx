@@ -13,12 +13,12 @@ export default function InitForm() {
   const { initializeGame, updateFilters } = useGame() 
 
   const [name, setName] = useState("")
-  const [age, setAge] = useState(25)
-  const [income, setIncome] = useState(3500)
-  const [capital, setCapital] = useState(10000)
-  const [interestRates, setInterestRates] = useState(3.5)
+  const [age, setAge] = useState(23)
+  const [income, setIncome] = useState(4800)
+  const [capital, setCapital] = useState(180000)
+  const [interestRates, setInterestRates] = useState(3.8)
 
-  const [savingsRate, setSavingsRate] = useState(20)
+  const [savingsRate, setSavingsRate] = useState(35)
   const [Region, setRegion] = useState("Bayern")
   const [City, setCity] = useState("München")
 
@@ -118,7 +118,7 @@ export default function InitForm() {
               <input
                 type="number"
                 min="18"
-                max="100"
+                max="40"
                 value={age}
                 onChange={(e) => setAge(Number(e.target.value))}
                 className="w-full px-4 py-3 bg-slate-900/50 border border-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg text-white outline-none transition-all"
@@ -144,14 +144,14 @@ export default function InitForm() {
                   className="w-full px-4 py-3 bg-slate-900/50 border border-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg text-white outline-none transition-all"
                 />
                 <div className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-green-400 font-mono bg-green-950/50 px-1.5 py-0.5 rounded">
-                  €{monthlySavings}/mo
+                  €{monthlySavings}/month
                 </div>
               </div>
             </div>
 
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <label className="text-xs font-bold text-slate-400 uppercase ml-1">Income/mo (€)</label>
+                <label className="text-xs font-bold text-slate-400 uppercase ml-1">Income/month (€)</label>
                 <InfoTooltip text="Your monthly net income." />
               </div>
               <input
