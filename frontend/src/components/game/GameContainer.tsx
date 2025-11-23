@@ -32,7 +32,7 @@ export default function GameContainer() {
                 </div>
 
                 {/* Main Action Buttons Container */}
-                <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center space-y-3 z-50 pointer-events-auto">
+                <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex flex-col items-center space-y-3 z-50 pointer-events-auto">
                     
                     {/* 1. Advance Timeline (Hauptaktion) */}
                     <motion.button

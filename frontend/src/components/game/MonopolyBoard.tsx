@@ -107,8 +107,8 @@ function Square({ index, offset }: { index: number; offset: number }) {
       }}
       className="absolute bottom-0 w-[600px] h-[200px] flex items-center justify-center origin-bottom"
       style={{
-        width: 600,
-        height: offset === 0 ? 350 : 500,
+        width: 500,
+        height: offset === 0 ? 300 : 400,
         transformStyle: "preserve-3d",
       }}
     >
@@ -144,16 +144,6 @@ function Square({ index, offset }: { index: number; offset: number }) {
         <div className="absolute left-0 top-0 bottom-0 w-2 bg-blue-500/50 blur-sm" />
         <div className="absolute right-0 top-0 bottom-0 w-2 bg-blue-500/50 blur-sm" />
 
-        {/* Current Step Indicator */}
-        {offset === 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="absolute -top-12 bg-blue-600 text-white px-4 py-1 rounded-full text-sm font-bold tracking-widest shadow-lg border border-blue-400"
-          >
-            {`Servus ${userName || "YOU"}`}
-          </motion.div>
-        )}
       </div>
     </motion.div>
   )

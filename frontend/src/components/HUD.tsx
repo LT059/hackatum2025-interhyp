@@ -48,15 +48,15 @@ export default function HUD() {
       {/* ------------------------------------- */}
       {/* Center: Logo & Restart Trigger */}
       {/* ------------------------------------- */}
-      <div className="absolute top-10 left-5/11 -translate-x-1/2 text-center pointer-events-auto">
+      <div className="absolute top-3 left-1/2 -translate-x-1/2 text-center pointer-events-auto">
         <div
           className="relative group cursor-pointer flex flex-col items-center"
           onClick={restartGame}
           title="Click to Restart Simulation"
         >
           {/* Subtle Back Glow */}
-          <div className="absolute inset-0 bg-blue-500/10 blur-3xl rounded-full group-hover:bg-blue-500/20 transition-all duration-300" />
-          <div className="flex-col pt-5">
+          <div className="absolute inset-0 bg-blue-500/10 blur-3xl rounded-full group-hover:bg-blue-500/15 transition-all duration-300" />
+          <div className="flex-col p-3">
 
             <div className="flex items-center gap-2 relative z-10">
               <Building2 className="w-6 h-6 text-blue-400 mt-0.5" />
@@ -64,7 +64,6 @@ export default function HUD() {
                 HOME<span className="text-blue-500">QUEST</span>
               </h1>
             </div>
-              <div>Back</div>
           </div>          
           {/* Separator Line with Gradient */}
           <div className="h-0.5 w-full max-w-xs bg-gradient-to-r from-transparent via-blue-500/60 to-transparent mt-2 opacity-50"></div>
