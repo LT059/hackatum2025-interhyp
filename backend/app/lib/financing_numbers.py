@@ -82,7 +82,10 @@ def fast_forward_years(state: State) -> int:
     new_total_loan = state.finance.desired_rates*state.finance.income * ((1+monthly_rate)**min_mortgage_time-1)/(monthly_rate*(1+monthly_rate)**min_mortgage_time)
 
     # New capital = old_capital + one_time_payements + recurrent_savings
-    capital_without_added_savings = state.finance.capital + state.chance[0].onetime_cost
+        
+    capital_without_added_savings = state.finance.capital
+    if state.chance==[]:
+        capital_without_added_savings += state.chance[0].onetime_cost
 
     minimal_time_float = (mid_price - capital_without_added_savings - new_total_loan)/(state.finance.desired_rates*state.finance.income*12)
 
