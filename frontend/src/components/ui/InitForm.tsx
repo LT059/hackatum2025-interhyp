@@ -95,7 +95,7 @@ export default function InitForm() {
           <div className="grid grid-cols-3 gap-4">
             <div className="col-span-2 space-y-2">
               <div className="flex items-center gap-2">
-                <label className="text-xs font-bold text-slate-400 uppercase ml-1">Codename</label>
+                <label className="text-xs font-bold text-slate-400 uppercase ml-1">QuestName</label>
                 <InfoTooltip text="Your alias in the simulation." />
               </div>
               <div className="relative">
@@ -104,7 +104,7 @@ export default function InitForm() {
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Enter Codename..."
+                  placeholder="Enter Questname"
                   className="w-full pl-10 pr-4 py-3 bg-slate-900/50 border border-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg text-white placeholder:text-slate-600 outline-none transition-all font-mono"
                   required
                 />
@@ -169,7 +169,7 @@ export default function InitForm() {
             {/* Start Capital (€) */}
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <label className="text-xs font-bold text-slate-400 uppercase ml-1">Start Capital (€)</label>
+                <label className="text-xs font-bold text-slate-400 uppercase ml-1">Start Quest (€)</label>
                 <InfoTooltip text="Money you have right now." />
               </div>
               <input
@@ -232,7 +232,7 @@ export default function InitForm() {
           </div>
 
           <button type="submit" className="group w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(37,99,235,0.4)] hover:shadow-[0_0_30px_rgba(37,99,235,0.6)] uppercase tracking-widest">
-            Start Simulation
+            Let's Game
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </button>
         </form>

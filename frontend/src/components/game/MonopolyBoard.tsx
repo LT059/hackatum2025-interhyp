@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { useGame } from "@/context/GameContext"
 
 export default function MonopolyBoard() {
-  const { square_id } = useGame()
+  const { square_id, userName } = useGame()
   // We maintain a local list of visible square indices to handle the "enter/exit" animation smoothly
   // The "current" square is always index 0 in this array visually, but logically it corresponds to square_id
   // actually, to support the "shift" animation, we might want to keep the array stable and shift values
@@ -58,6 +58,7 @@ export default function MonopolyBoard() {
 }
 
 function Square({ index, offset }: { index: number; offset: number }) {
+  const { userName } = useGame()
   // offset 0 = closest to camera (standing on it)
   // offset increases into distance
 
@@ -144,19 +145,15 @@ function Square({ index, offset }: { index: number; offset: number }) {
         <div className="absolute right-0 top-0 bottom-0 w-2 bg-blue-500/50 blur-sm" />
 
         {/* Current Step Indicator */}
-        {offset === 0 /*&& (
-
-            /*
+        {offset === 0 && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             className="absolute -top-12 bg-blue-600 text-white px-4 py-1 rounded-full text-sm font-bold tracking-widest shadow-lg border border-blue-400"
           >
-            YOU
+            {`Servus ${userName || "YOU"}`}
           </motion.div>
-        )
-             */
-        }
+        )}
       </div>
     </motion.div>
   )
