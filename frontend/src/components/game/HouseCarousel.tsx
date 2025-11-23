@@ -89,8 +89,8 @@ const [isInitialLoad, setIsInitialLoad] = useState(true);
         </div>
 
         {/* Text */}
-        <h2 className="text-xl font-bold uppercase tracking-widest text-blue-400">
-          No Houses Found
+        <h2 className="pl-3 text-center text-xl font-bold uppercase tracking-widest text-blue-400">
+          Keep Calm and save your money!
         </h2>
         <p className="text-xs text-slate-400 mt-2 text-center px-6">
           Try adjusting your filters or advancing your timeline to see available listings!
@@ -143,13 +143,13 @@ const [isInitialLoad, setIsInitialLoad] = useState(true);
             return (
               <motion.div
                 key={house.id}
-                className="absolute"
+                className="absolute -top-10"
                 initial={false}
                 animate={{
-                  x: offset * 320, // Spacing
+                  x: offset * 420, // Spacing
                   z: isActive ? 0 : -200, // Depth
                   scale: isActive ? 1 : 0.8,
-                  opacity: isActive ? 1 : 0.5,
+                  opacity: isActive ? 1 : 0.8,
                   rotateY: offset * -15, // Rotate slightly towards center
                 }}
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
@@ -168,14 +168,14 @@ const [isInitialLoad, setIsInitialLoad] = useState(true);
       {/* Controls */}
       <button
         onClick={prevSlide}
-        className="absolute left-10 top-1/2 -translate-y-1/2 p-3 rounded-full bg-blue-900/50 border border-blue-500 text-blue-200 hover:bg-blue-800 hover:text-white transition-all z-20"
+        className="absolute left-32 top-2/5 -translate-y-1/2 p-3 rounded-full bg-blue-900/50 border border-blue-500 text-blue-200 hover:bg-blue-800 hover:text-white transition-all z-20"
       >
         <ChevronLeft size={32} />
       </button>
 
       <button
         onClick={nextSlide}
-        className="absolute right-10 top-1/2 -translate-y-1/2 p-3 rounded-full bg-blue-900/50 border border-blue-500 text-blue-200 hover:bg-blue-800 hover:text-white transition-all z-20"
+        className="absolute right-32 top-2/5 -translate-y-1/2 p-3 rounded-full bg-blue-900/50 border border-blue-500 text-blue-200 hover:bg-blue-800 hover:text-white transition-all z-20"
       >
         <ChevronRight size={32} />
       </button>
