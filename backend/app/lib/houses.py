@@ -64,7 +64,8 @@ def load_houses(filter_options: FilterOptions, max_results: int):
                 construction_year=h["constructionYear"],
                 region=h["region"],
                 city=city,
-                link=link
+                link=link,
+                type=filter_options.type
             )
             results.append(house)
         except ValidationError as e:

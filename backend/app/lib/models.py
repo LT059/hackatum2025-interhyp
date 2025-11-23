@@ -16,6 +16,7 @@ class House(SQLModel, table=True):
     region: str = Field(default="", index=True)
     city: str = Field(default="", index=True)
     link: str = Field(default="", index=False)
+    type: str = Field(default="", index=True)
 
 class HouseResponse(BaseModel):
     id: str

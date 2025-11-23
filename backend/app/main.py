@@ -109,6 +109,7 @@ def get_houses(state: State, db: Session = Depends(get_db), ):
     if (db.query(models.House)
             .filter(models.House.city == state.filter_option.city)
             .filter(models.House.region == state.filter_option.region)
+            .filter(models.House.type == state.filter_option.type)
             .first()) is None:
         LOGGER.info("Region/city not in DB. Accessing API now")
         insert_into_db(state, db)
@@ -118,6 +119,7 @@ def get_houses(state: State, db: Session = Depends(get_db), ):
                      .filter(models.House.city == state.filter_option.city)
                      .filter(House.buying_price <= state.equity[1])
                      .filter(House.buying_price >= state.equity[0])
+                     .filter(models.House.type == state.filter_option.type)
                      .limit(MAX_RESULTS_HOUSES).all())
 
     response = []
