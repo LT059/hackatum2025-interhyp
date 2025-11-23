@@ -102,6 +102,10 @@ def change_age(request_state: ChangeAge):
 @app.post("/houses")
 def get_houses(state: State, db: Session = Depends(get_db), ):
     # temp_result =
+    if state.equity == []:
+        state.equity = [0, 0]
+        state.equity[0] = calculator.calculate_equity(10, state)
+        state.equity[1] = calculator.calculate_equity(25, state)
     if (db.query(models.House)
             .filter(models.House.city == state.filter_option.city)
             .filter(models.House.region == state.filter_option.region)
