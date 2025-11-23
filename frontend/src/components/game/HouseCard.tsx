@@ -2,30 +2,65 @@
 
 import { motion } from "framer-motion"
 import Image from "next/image"
+import { useState, useRef } from "react"
 import type { House } from "@/lib/mock-data"
 import { cn } from "@/lib/utils"
-import { DollarSign, Maximize, BedDouble, Calendar, ExternalLink } from "lucide-react"
+// Clock für die Finanzierungsdauer hinzugefügt, Calendar für das Baujahr beibehalten
+import { DollarSign, Maximize, BedDouble, Calendar, ExternalLink, Clock } from "lucide-react" 
 
 interface HouseCardProps {
-    house: House & { // Erweiterung der House-Struktur für die neuen Felder
+    house: House & { 
         finance_duration?: number; // Dauer in Jahren
         link?: string; // Link zur Immobilie
+        constructionYear?: number; // NEUES FELD: Baujahr
     }
-    isHighlighted?: boolean // Bleibt als Prop, wird aber im Styling ignoriert
+    isHighlighted?: boolean
     isActive: boolean
 }
 
-export default function HouseCard({ house, isHighlighted, isActive }: HouseCardProps) {
+export default function HouseCard({ house, isActive }: HouseCardProps) {
+    const [isHovering, setIsHovering] = useState(false)
+    const containerRef = useRef<HTMLDivElement>(null)
+    const titleRef = useRef<HTMLHeadingElement>(null)
+
+    const getAnimationDistance = () => {
+        if (!containerRef.current || !titleRef.current) return 0
+        
+        const containerWidth = containerRef.current.clientWidth
+        const titleWidth = titleRef.current.scrollWidth
+        
+        return titleWidth > containerWidth ? -(titleWidth - containerWidth) - 10 : 0
+    }
+
+    const getAnimationDuration = () => {
+        if (!titleRef.current) return 3
+        const titleLength = titleRef.current.scrollWidth
+        return Math.max(3, titleLength / 50) 
+    }
+
+    const titleVariants = {
+        initial: { x: 0 },
+        animate: {
+            x: getAnimationDistance(),
+            transition: {
+                repeat: Infinity,
+                repeatType: "reverse" as const,
+                duration: getAnimationDuration(),
+                ease: "linear",
+            },
+        },
+    }
+
     return (
         <motion.div
             className={cn(
                 "w-[300px] h-[420px] bg-slate-900/80 backdrop-blur-md rounded-xl border border-slate-700 overflow-hidden flex flex-col relative",
-                // isHighlighted Styling entfernt: Keine neon-green-glow oder border-green-500/50
                 isActive ? "opacity-100 scale-100 z-10" : "opacity-60 scale-90 z-0 grayscale",
             )}
-            // Anpassung der Hover-Animation: Karte wird breiter und leicht nach links verschoben
-            whileHover={isActive ? { scale: 1.05, x: -10, width: 340, height: 440 } : {}}
-            transition={{ type: "spring", stiffness: 300, duration: 0.3 }}
+            onHoverStart={() => isActive && setIsHovering(true)}
+            onHoverEnd={() => isActive && setIsHovering(false)}
+            whileHover={isActive ? { scale: 1.05, y: -10 } : {}}
+            transition={{ type: "spring", stiffness: 300 }}
         >
             {/* Image Area */}
             <div className="relative h-48 w-full bg-slate-800 border-b border-slate-700">
@@ -36,22 +71,25 @@ export default function HouseCard({ house, isHighlighted, isActive }: HouseCardP
             {/* Content */}
             <div className="p-4 flex-1 flex flex-col gap-3">
                 
-                <motion.h3
-                    className={cn(
-                        "text-xl font-bold uppercase tracking-wider overflow-hidden whitespace-nowrap",
-                        // isHighlighted Text-Farbe entfernt. Nur die blaue Standardfarbe bleibt.
-                        "text-blue-400", 
-                    )}
-                    initial={{ x: 0, opacity: 1 }}
-                    whileHover={{ 
-                        x: -5,
-                        transition: { type: "tween", duration: 0.5, delay: 0.2 } 
-                    }}
+                {/* Titel mit Marquee-Animation */}
+                <div 
+                    ref={containerRef} 
+                    className="overflow-hidden whitespace-nowrap"
                 >
-                    {house.title}
-                </motion.h3>
+                    <motion.h3
+                        ref={titleRef}
+                        className={cn(
+                            "text-xl font-bold uppercase tracking-wider text-blue-400",
+                            "whitespace-nowrap inline-block",
+                        )}
+                        animate={isHovering ? "animate" : "initial"}
+                        variants={titleVariants}
+                    >
+                        {house.title}
+                    </motion.h3>
+                </div>
 
-                {/* Property Details Grid */}
+                {/* Property Details Grid (Angepasst) */}
                 <div className="grid grid-cols-2 gap-2 text-sm text-slate-300">
                     <div className="flex items-center gap-1">
                         <DollarSign className="w-3 h-3 text-blue-500" />
@@ -61,15 +99,26 @@ export default function HouseCard({ house, isHighlighted, isActive }: HouseCardP
                         <Maximize className="w-3 h-3 text-blue-500" />
                         <span>{house.squaremeter}m²</span>
                     </div>
+                    
+                    {/* Baujahr (NEU) */}
+                    {house.constructionYear !== undefined && (
+                        <div className="flex items-center gap-1">
+                            <Calendar className="w-3 h-3 text-blue-500" />
+                            <span>Built {house.constructionYear}</span>
+                        </div>
+                    )}
+                    
+                    {/* Rooms */}
                     <div className="flex items-center gap-1">
                         <BedDouble className="w-3 h-3 text-blue-500" />
                         <span>{house.rooms} Rooms</span>
                     </div>
                     
-                    {/* Finance Duration */}
+                    {/* Finance Duration (Angepasst) */}
                     {house.finance_duration !== undefined && (
                         <div className="flex items-center justify-center gap-1 col-span-2 py-1 px-2 border border-slate-700 bg-slate-800/50 rounded-md mt-1">
-                            <Calendar className="w-3 h-3 text-blue-400" />
+                            {/* Icon zu Clock geändert */}
+                            <Clock className="w-3 h-3 text-blue-400" /> 
                             <span className="text-xs font-semibold text-slate-300">
                                 Mortgage Duration {house.finance_duration} Years
                             </span>
@@ -77,10 +126,7 @@ export default function HouseCard({ house, isHighlighted, isActive }: HouseCardP
                     )}
                 </div>
 
-                {/* Das "Top Match" Banner wurde entfernt. */}
-                {/* {isHighlighted && (...) } */}
-
-                {/* Link Button - Styling auf blau vereinheitlicht */}
+                {/* Link Button */}
                 {house.link && (
                     <a
                         href={house.link}
@@ -88,7 +134,6 @@ export default function HouseCard({ house, isHighlighted, isActive }: HouseCardP
                         rel="noopener noreferrer"
                         className={cn(
                             "w-full flex items-center justify-center gap-2 py-2 text-sm font-semibold rounded transition-colors mt-auto",
-                            // Styling ist nun immer BLAU, unabhängig von isHighlighted
                             "bg-blue-600 hover:bg-blue-500 text-white shadow-md shadow-blue-600/30"
                         )}
                     >
