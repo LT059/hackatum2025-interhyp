@@ -79,7 +79,7 @@ def fast_forward_years(state: State) -> int:
     monthly_rate = state.finance.interest_rates / 100 / 12
 
     # monthly annuity rate only
-    new_total_loan = state.finance.desired_rates*state.finance.income * ((1+monthly_rate)**min_mortgage_time-1)/(monthly_rate*(1+monthly_rate)**min_mortgage_time)
+    new_total_loan = state.finance.desired_rates/100*state.finance.income * ((1+monthly_rate)**min_mortgage_time-1)/(monthly_rate*(1+monthly_rate)**min_mortgage_time)
 
     # New capital = old_capital + one_time_payements + recurrent_savings
         
@@ -87,7 +87,7 @@ def fast_forward_years(state: State) -> int:
     if state.chance!=[]:
         capital_without_added_savings += state.chance[0].onetime_cost
 
-    minimal_time_float = (mid_price - capital_without_added_savings - new_total_loan)/(state.finance.desired_rates*state.finance.income*12)
+    minimal_time_float = (mid_price - capital_without_added_savings - new_total_loan)/(state.finance.desired_rates/100*state.finance.income*12)
 
     # ceiling function and cap to next age
     minimal_fast_forward_time = max(int(minimal_time_float) + 1, 1)
