@@ -86,6 +86,8 @@ def change_age(request_state: ChangeAge):
     state.equity = [0, 0]
     state.equity[0] = calculator.calculate_equity(10, state)
     state.equity[1] = calculator.calculate_equity(25, state)
+
+    state.square_id += request_state.delta_age
     return state
 
 
