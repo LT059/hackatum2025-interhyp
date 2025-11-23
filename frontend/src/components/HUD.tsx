@@ -48,7 +48,7 @@ export default function HUD() {
       {/* ------------------------------------- */}
       {/* Center: Logo & Restart Trigger */}
       {/* ------------------------------------- */}
-      <div className="absolute top-3 left-1/2 -translate-x-1/2 text-center pointer-events-auto">
+      <div className="absolute top-7 left-1/2 -translate-x-1/2 text-center pointer-events-auto">
         <div
           className="relative group cursor-pointer flex flex-col items-center"
           onClick={restartGame}

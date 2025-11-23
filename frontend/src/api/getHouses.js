@@ -6,6 +6,7 @@ export async function getHouses(gameState) {
     if (gameState.filter_option.type === "") {
       gameState.filter_option.type = "APARTMENTBUY";
     }
+    console.log(gameState.filter_option.type)
     const response = await fetch(API_URL, {
       method: "POST",
       headers: {

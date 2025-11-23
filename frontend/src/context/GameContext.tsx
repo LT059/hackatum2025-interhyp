@@ -400,7 +400,7 @@ function BackendStateToAiState(backendState: any, aiState: GameState): GameState
         })),
         filters: {
             ...aiState.filters,
-            type: backendState.filter_option.type.split(","),
+            type: backendState.filter_option.type,
             sortBy: backendState.filter_option.sort_type,
             max_price: backendState.filter_option.max_budget,
             city: backendState.filter_option.city,

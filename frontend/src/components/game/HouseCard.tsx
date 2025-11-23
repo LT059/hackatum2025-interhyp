@@ -101,10 +101,10 @@ export default function HouseCard({ house, isActive }: HouseCardProps) {
                     </div>
                     
                     {/* Baujahr (NEU) */}
-                    {house.constructionYear !== undefined && (
+                    {house.constructionYear !== 0 && (
                         <div className="flex items-center gap-1">
                             <Calendar className="w-3 h-3 text-blue-500" />
-                            <span>Built {house.constructionYear}</span>
+                            <span>Built in {house.constructionYear}</span>
                         </div>
                     )}
                     
