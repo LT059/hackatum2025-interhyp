@@ -3,6 +3,9 @@ const API_URL = `${API_BASE_URL}/houses`;
 
 export async function getHouses(gameState) {
   try {
+    if (gameState.filter_option.type === "") {
+      gameState.filter_option.type = "APARTMENTBUY";
+    }
     const response = await fetch(API_URL, {
       method: "POST",
       headers: {
