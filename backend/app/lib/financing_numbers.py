@@ -31,7 +31,7 @@ def optimal_financing(state: State, house: House) -> float:
     loan = brutto_buying_price - state.finance.capital
     monthly_annuity_payments = (state.finance.desired_rates/100) * state.finance.income
 
-    print("Rates", (state.finance.desired_rates/100) * state.finance.income)
+    # print("Rates", (state.finance.desired_rates/100) * state.finance.income)
 
     # compute months needed to pay back above loan
     m = np.log(1/(1-loan*monthly_rate/monthly_annuity_payments))/np.log(1+monthly_rate)
@@ -84,7 +84,7 @@ def fast_forward_years(state: State) -> int:
     # New capital = old_capital + one_time_payements + recurrent_savings
         
     capital_without_added_savings = state.finance.capital
-    if state.chance==[]:
+    if state.chance!=[]:
         capital_without_added_savings += state.chance[0].onetime_cost
 
     minimal_time_float = (mid_price - capital_without_added_savings - new_total_loan)/(state.finance.desired_rates*state.finance.income*12)

@@ -8,7 +8,7 @@ LOGGER = logging.getLogger("Calculator")
 URL = "https://www.interhyp.de/customer-generation/budget/calculateMaxBuyingPower"
 
 
-def calculate_equity(mortgage_years: int, state: State):
+def calculate_equity(mortgage_years: int, state: State, storage: list[int], pos: int):
     LOGGER.info(f"Calculating maximum affordable real estate value for state {state}")
     session = requests.Session()
 
@@ -30,5 +30,5 @@ def calculate_equity(mortgage_years: int, state: State):
     LOGGER.info(f"Response from calculator: {response.status_code} {response.text}")
     response = response.json()
 
-    return response["scoringResult"]["priceBuilding"]
+    storage[pos] =  response["scoringResult"]["priceBuilding"]
 

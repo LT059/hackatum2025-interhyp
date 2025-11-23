@@ -1,4 +1,5 @@
 import logging
+from threading import Thread
 
 from fastapi import FastAPI, Depends
 from sqlalchemy.exc import IntegrityError
@@ -36,7 +37,6 @@ app.add_middleware(
 
 LOGGER = logging.getLogger("House offers")
 
-
 def get_db():
     db = database.SessionLocal()
     try:
@@ -69,7 +69,6 @@ def initialize(state: State, db: Session = Depends(get_db)):
 
 @app.post("/change-age")
 def change_age(request_state: ChangeAge):
-
     if request_state.delta_age == -1:
         request_state.delta_age = fast_forward_years(request_state.state)
     
@@ -84,8 +83,17 @@ def change_age(request_state: ChangeAge):
     state.finance.capital += state.finance.income * SAVINGS_RATE * 12 * request_state.delta_age
 
     state.equity = [0, 0]
-    state.equity[0] = calculator.calculate_equity(10, state)
-    state.equity[1] = calculator.calculate_equity(25, state)
+    store = [0, 0]
+    t = Thread(target = calculator.calculate_equity, args=(10, state.copy(), store, 0))
+    t2 = Thread(target = calculator.calculate_equity, args=(25, state.copy(), store, 1))
+
+    t.start()
+    t2.start()
+
+    t.join()
+    t2.join()
+
+    state.equity = store
 
     state.square_id += request_state.delta_age
     return state
@@ -95,8 +103,9 @@ def change_age(request_state: ChangeAge):
 def get_houses(state: State, db: Session = Depends(get_db), ):
     # temp_result =
     if (db.query(models.House)
+            .filter(models.House.city == state.filter_option.city)
             .filter(models.House.region == state.filter_option.region)
-            .filter(models.House.city == state.filter_option.city).first()) is None:
+            .first()) is None:
         LOGGER.info("Region/city not in DB. Accessing API now")
         insert_into_db(state, db)
 

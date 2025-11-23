@@ -13,8 +13,8 @@ class House(SQLModel, table=True):
     image_url: str = Field(default="", index=False)
     construction_year: int = Field(default=0, index=False)
     condition: str = Field(default="", index=False)
-    region: str = Field(default="", index=False)
-    city: str = Field(default="", index=False)
+    region: str = Field(default="", index=True)
+    city: str = Field(default="", index=True)
     link: str = Field(default="", index=False)
 
 class HouseResponse(BaseModel):
@@ -66,6 +66,7 @@ class State(BaseModel):
     filter_option: FilterOptions
     chance: list[Chance] | None
     finance: Finance
+
 
 class ChangeAge(BaseModel):
     delta_age: int
