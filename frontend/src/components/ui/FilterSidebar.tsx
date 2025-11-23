@@ -49,7 +49,7 @@ export default function FilterSidebar() {
     // Hier wird davon ausgegangen, dass 'getHouses' stabil ist.
     useEffect(() => {
         getHouses()
-    }, [filters, getHouses])
+    }, [filters])
 
     // Hilfsfunktion zur Behandlung der Regionsänderung
     const handleRegionChange = useCallback((newRegion: string) => {

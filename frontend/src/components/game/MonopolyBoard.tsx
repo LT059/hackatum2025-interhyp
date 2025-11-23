@@ -144,7 +144,9 @@ function Square({ index, offset }: { index: number; offset: number }) {
         <div className="absolute right-0 top-0 bottom-0 w-2 bg-blue-500/50 blur-sm" />
 
         {/* Current Step Indicator */}
-        {offset === 0 && (
+        {offset === 0 /*&& (
+
+            /*
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -152,7 +154,9 @@ function Square({ index, offset }: { index: number; offset: number }) {
           >
             YOU
           </motion.div>
-        )}
+        )
+             */
+        }
       </div>
     </motion.div>
   )
