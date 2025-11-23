@@ -70,7 +70,7 @@ export default function FilterSidebar() {
 
     // Property Types (unverändert)
     const propertyTypes = [
-        { value: "APPARTMENTBUY", label: "Apt", icon: Building2 },
+        { value: "APARTMENTBUY", label: "Apt", icon: Building2 },
         { value: "HOUSEBUY", label: "House", icon: Home },
         { value: "LANDBUY", label: "Land", icon: Trees },
         { value: "GARAGEBUY", label: "Garage", icon: Warehouse },
@@ -82,7 +82,7 @@ export default function FilterSidebar() {
             {/* Öffnungsknopf für das Popup (kann überall platziert werden, hier nur ein Beispiel) */}
             <button
                 onClick={() => setIsOpen(true)}
-                className="fixed bottom-6 right-25 z-50 p-4 bg-blue-600 rounded-full text-white shadow-lg hover:bg-blue-500 transition-all flex items-center gap-2 font-bold uppercase tracking-wider"
+                className="fixed bottom-6 left-10 z-50 p-4 bg-blue-600 rounded-full text-white shadow-lg hover:bg-blue-500 transition-all flex items-center gap-2 font-bold uppercase tracking-wider"
             >
                 <SlidersHorizontal size={18} />
                 Filters
@@ -137,7 +137,7 @@ export default function FilterSidebar() {
                                         Type Selection
                                         <span className="h-px flex-1 bg-slate-800"></span>
                                     </h3>
-                                    <div className="grid grid-cols-4 gap-2"> {/* 4 Spalten für mehr Balance */}
+                                    <div className="grid grid-cols-3 gap-2"> {/* 4 Spalten für mehr Balance */}
                                         {propertyTypes.map((type) => (
                                             <button
                                                 key={type.value}
@@ -152,18 +152,7 @@ export default function FilterSidebar() {
                                                 <span className="text-[9px] font-medium uppercase">{type.label}</span>
                                             </button>
                                         ))}
-                                        {/* Reset-Button (All) */}
-                                        <button
-                                            onClick={() => updateFilters({ type: "" })}
-                                            className={`flex flex-col items-center justify-center gap-1 p-2 rounded-lg border transition-all ${
-                                                !filters.type
-                                                    ? "bg-purple-600/30 border-purple-400 text-purple-200 shadow-[0_0_8px_rgba(168,85,247,0.3)]"
-                                                    : "bg-slate-900/60 border-slate-700/50 text-slate-500 hover:border-purple-600/50 hover:text-purple-300"
-                                            }`}
-                                        >
-                                            <Home size={16} strokeWidth={1.8} />
-                                            <span className="text-[9px] font-medium uppercase">All</span>
-                                        </button>
+                                        
                                     </div>
                                 </div>
 

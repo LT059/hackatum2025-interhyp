@@ -14,7 +14,7 @@ export default function MonopolyBoard() {
   const VISIBLE_COUNT = 12
 
   return (
-    <div className="fixed inset-0 w-full h-full overflow-hidden bg-black pointer-events-none">
+    <div className="fixed inset-0 w-full h-full overflow-hidden bg-black pointer-events-none bg-[url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop')] bg-cover bg-center bg-black/60">
       {/* Atmospheric Background */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-indigo-950/50 via-black to-black z-0" />
 

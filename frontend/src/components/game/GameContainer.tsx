@@ -21,7 +21,7 @@ export default function GameContainer() {
 
     return (
         <main className="relative w-full h-screen overflow-hidden bg-slate-950 font-sans text-slate-100 selection:bg-blue-500/30">
-            <GameDebugger />
+            {/*<GameDebugger />*/}
             <MonopolyBoard />
             <HUD />
             {/* Main Game Stage */}
