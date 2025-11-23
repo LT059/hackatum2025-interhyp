@@ -64,7 +64,7 @@ export default function HUD() {
                 HOME<span className="text-blue-500">QUEST</span>
               </h1>
             </div>
-              <text>Back</text>
+              <div>Back</div>
           </div>          
           {/* Separator Line with Gradient */}
           <div className="h-0.5 w-full max-w-xs bg-gradient-to-r from-transparent via-blue-500/60 to-transparent mt-2 opacity-50"></div>
