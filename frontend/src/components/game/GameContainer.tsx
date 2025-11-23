@@ -41,7 +41,7 @@ export default function GameContainer() {
                         onClick={() => changeAge(1)}
                         className="flex items-center gap-2 px-12 py-3 bg-gradient-to-r from-blue-500 to-indigo-700 rounded-full font-black text-white uppercase tracking-widest text-sm shadow-[0_0_20px_rgba(79,70,229,0.7)] border border-white/30 hover:shadow-[0_0_40px_rgba(79,70,229,1)] transition-all"
                     >
-                        Advance Timeline
+                        Advance One Year
                         <ChevronRight size={16} />
                     </motion.button>
 
