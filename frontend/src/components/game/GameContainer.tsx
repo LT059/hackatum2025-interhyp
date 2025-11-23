@@ -9,20 +9,11 @@ import HUD from "../HUD"
 import { motion } from "framer-motion"
 import MonopolyBoard from "./MonopolyBoard"
 import OnboardingGuide from "../ui/OnboardingGuide"
-import { useState, useEffect } from "react" // useEffect hinzugefügt
-import { ChevronRight, ChevronLeft } from "lucide-react" // ChevronLeft für den Fast Forward Button
+import { useState } from "react"
+import { ChevronRight } from "lucide-react" // Icons für die Buttons hinzugefügt
 
 export default function GameContainer() {
-    // preloadNextAge vom Context importieren
-    const { isInitialized, changeAge, age, preloadNextAge } = useGame()
-
-    // NEU: Löst das Vorladen der Häuser für das nächste Alter aus
-    useEffect(() => {
-        // Sicherstellen, dass die Initialisierung abgeschlossen ist und die Funktion existiert
-        if (isInitialized && preloadNextAge) {
-            preloadNextAge() 
-        }
-    }, [isInitialized, age, preloadNextAge]) // Lädt neu, wenn das Alter (age) oder der Initialisierungsstatus sich ändert
+    const { isInitialized, changeAge } = useGame()
 
     if (!isInitialized) {
         return <InitForm />
@@ -43,7 +34,7 @@ export default function GameContainer() {
                 {/* Main Action Buttons Container */}
                 <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center space-y-3 z-50 pointer-events-auto">
                     
-                    {/* 1. Advance Timeline (Hauptaktion: +1) */}
+                    {/* 1. Advance Timeline (Hauptaktion) */}
                     <motion.button
                         whileHover={{ scale: 1.05, y: -2 }}
                         whileTap={{ scale: 0.95 }}
@@ -54,17 +45,16 @@ export default function GameContainer() {
                         <ChevronRight size={16} />
                     </motion.button>
 
-                    {/* 2. Fast Forward (Sekundär-/Debug-Aktion: -1) */}
+                    {/* 2. Fast Forward (Sekundär-/Debug-Aktion: Zurückspulen) */}
                     <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        onClick={() => changeAge(-1)} // Reduziert das Alter um 1 Jahr (wie gewünscht)
+                        onClick={() => changeAge(-1)}
                         // Konturiertes, subtileres Design
                         className="flex items-center gap-2 px-8 py-2 bg-transparent border border-blue-600 rounded-full font-bold text-blue-300 uppercase tracking-wide text-[10px] shadow-[0_0_10px_rgba(37,99,235,0.3)] hover:bg-blue-900/20 hover:text-white transition-all"
                     >
-                        {/* Icon zur Verdeutlichung beibehalten */}
-                        <ChevronLeft size={14} /> 
-                        Fast Forward (Debug)
+                        Fast Forward
+                        <ChevronRight size={14} />
                     </motion.button>
                 </div>
             </div>

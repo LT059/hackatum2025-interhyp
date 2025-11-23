@@ -1,13 +1,10 @@
 "use client"
 
 import type React from "react"
-import { createContext, useContext, useState, useEffect, useCallback } from "react" // useCallback hinzugefügt
+import { createContext, useContext, useState, useEffect } from "react"
 import { type House} from "@/lib/mock-data"
 import { changeAge as changeAgeApi } from '../api/changeAge';
 import { getHouses as getHousesApi } from '../api/getHouses';
-
-// Caching State Typ
-type HouseCache = Record<number, House[]>;
 
 interface GameState {
     isInitialized: boolean
@@ -59,14 +56,12 @@ interface GameContextType extends GameState {
         desiredRates: number,
         savingsRate: number,
     ) => void
-    changeAge: (age: number) => Promise<void>
+    changeAge: (age:number) => Promise<void>
     changeChance: (data: LifeEventData) => Promise<void>
     updateFilters: (filters: Partial<GameState["filters"]>) => Promise<void>
     getHouses: () => Promise<House[]>
     restartGame: () => Promise<void>
     userName: string
-    // NEU: Preloading Funktion für den GameContainer
-    preloadNextAge: () => void 
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined)
@@ -84,7 +79,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
             desired_rates: 7.0,
             savings_rate: 20,
         },
-        houses: [], 
+        houses: [], // leer initialisieren
         activeChance: [],
         filters: {
             type: [],
@@ -99,78 +94,6 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     })
 
     const [userName, setUserName] = useState("")
-    // NEU: State für den House-Cache
-    const [houseCache, setHouseCache] = useState<HouseCache>({});
-
-
-    // Hilfsfunktion zum Laden der Häuser (wird in changeAge und preloadNextAge verwendet)
-    const loadHouses = async (gameState: GameState) => {
-        const backendHouses = await getHousesApi(AiStateToBackendState(gameState));
-        return houseToArray(backendHouses);
-    }
-    
-    // NEU: Funktion zum Vorladen des nächsten Alters
-    const preloadNextAge = useCallback(async () => {
-        const nextAge = state.age + 1;
-
-        if (houseCache[nextAge] === undefined) {
-            // Temporären State erstellen, der das nächste Alter simuliert, um die API korrekt aufzurufen
-            const tempState = { ...state, age: nextAge };
-            const nextHouses = await loadHouses(tempState);
-            
-            // Speichern im Cache
-            setHouseCache(prev => ({ ...prev, [nextAge]: nextHouses }));
-            console.log(`[Cache] Preloaded houses for age: ${nextAge}`);
-        }
-    }, [state.age, state.filters, houseCache]); // Dependencies sind wichtig für korrekte Daten
-
-    
-    const changeAge = async (amount: number) => {
-        const newAge = state.age + amount;
-        
-        // 1. Backend API aufrufen, um den neuen Spielstatus (finances, equity etc.) zu berechnen
-        try {
-            const old_state = AiStateToBackendState(state);
-            const new_state_from_api = await changeAgeApi(amount, old_state);
-            
-            // Aktualisiere den State mit den neuen Finanzdaten
-            const updatedState = BackendStateToAiState(new_state_from_api, state);
-            
-            // 2. Häuser laden (mit oder ohne Cache)
-            let newHouses: House[] = [];
-
-            if (amount === 1 && houseCache[newAge]) {
-                // CACHE HIT: Verwende die vorgeladenen Daten
-                newHouses = houseCache[newAge];
-                setHouseCache(prev => {
-                    const next = { ...prev };
-                    delete next[newAge]; // Entferne die Daten, da sie jetzt verwendet werden
-                    return next;
-                });
-                console.log(`[Cache] Used houses from cache for age: ${newAge}`);
-            } else {
-                // CACHE MISS oder Rückwärtsbewegung: Lade die Häuser neu vom Backend
-                newHouses = await loadHouses(updatedState);
-                console.log(`[Cache] Loaded houses directly for age: ${newAge}`);
-            }
-            
-            // 3. Finalen State setzen
-            setState({
-                ...updatedState,
-                houses: newHouses,
-            });
-
-        } catch (error) {
-            console.error("Fehler beim Aufrufen von changeAgeApi:", error);
-        }
-    }
-    
-    // ... andere Funktionen (initializeGame, updateFilters, getHouses, restartGame) bleiben unverändert
-    // Der Code für initializeGame, updateFilters, getHouses und restartGame wurde weggelassen,
-    // um die Übersichtlichkeit zu erhöhen. Bitte fügen Sie ihn unterhalb des changeAge-Blocks ein.
-    // Achten Sie darauf, dass `getHouses` die neue `loadHouses`-Hilfsfunktion verwendet.
-
-    // ********** Hier die unveränderten Funktionen einfügen **********
 
     const changeChance = async (data: LifeEventData) => {
         setState((prev) => ({
@@ -207,7 +130,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         }))
 
         // Houses nach Initialisierung laden
-        const initState = {
+        const backendHouses = await getHousesApi(AiStateToBackendState({
             ...state,
             age,
             finances: {
@@ -218,28 +141,37 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
                 savings_rate: savingsRate,
             },
             isInitialized: true
+        }))
+        setState((prev) => ({ ...prev, houses: houseToArray(backendHouses) }))
+    }
+
+
+    const changeAge = async (age: number) => {
+        try {
+            const old_state = AiStateToBackendState(state)
+            const new_state = await changeAgeApi(age, old_state)
+            setState((prev) => BackendStateToAiState(new_state, prev))
+            const backendHouses = await getHousesApi(AiStateToBackendState(state))
+            setState((prev) => ({ ...prev, houses: houseToArray(backendHouses) }))
+
+        } catch (error) {
+            console.error("Fehler beim Aufrufen von changeAgeApi:", error)
         }
-        const frontendHouses = await loadHouses(initState);
-        setState((prev) => ({ ...prev, houses: frontendHouses }))
     }
 
     const updateFilters = async (newFilters: Partial<GameState["filters"]>) => {
-        // Zuerst Filter aktualisieren
-        const updatedState = {
-            ...state,
-            filters: { ...state.filters, ...newFilters },
-        };
-        setState(updatedState);
-
-        // Dann Häuser neu laden, da Filteränderungen die Häuserliste beeinflussen
-        const frontendHouses = await loadHouses(updatedState);
-        setState((prev) => ({ ...prev, houses: frontendHouses }));
+        await setState((prev) => ({
+            ...prev,
+            filters: { ...prev.filters, ...newFilters },
+        }))
+        //await getHouses()
     }
 
     const getHouses = async () => {
-        const frontendHouses = await loadHouses(state);
-        setState((prev) => ({ ...prev, houses: frontendHouses }));
-        return frontendHouses;
+        const backendHouses = await getHousesApi(AiStateToBackendState(state))
+        const frontendHouses = houseToArray(backendHouses)
+        setState((prev) => ({ ...prev, houses: frontendHouses }))
+        return frontendHouses
     }
 
     const restartGame = async () => {
@@ -271,16 +203,14 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
             lastSquareCapital: 10000,
         }
 
-        setState(initialState)
-        setHouseCache({}); // Cache leeren
+        await setState(initialState)
 
         // Houses nach Reset laden
-        const frontendHouses = await loadHouses(initialState)
-        setState((prev) => ({ ...prev, houses: frontendHouses }))
+        const backendHouses = await getHousesApi(AiStateToBackendState(initialState))
+        setState((prev) => ({ ...prev, houses: houseToArray(backendHouses) }))
     }
 
-    // *************************************************************
-    
+
     return (
         <GameContext.Provider
             value={{
@@ -292,7 +222,6 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
                 getHouses,
                 changeChance,
                 restartGame,
-                preloadNextAge, // NEU: Funktion bereitstellen
             }}
         >
             {children}
@@ -308,7 +237,7 @@ export function useGame() {
     return context
 }
 
-// Hilfsfunktionen (unverändert)
+// Hilfsfunktionen
 
 function AiStateToBackendState(state: GameState) {
     return {
