@@ -71,7 +71,7 @@ export default function HouseCard({ house, isHighlighted, isActive }: HouseCardP
                         <div className="flex items-center justify-center gap-1 col-span-2 py-1 px-2 border border-slate-700 bg-slate-800/50 rounded-md mt-1">
                             <Calendar className="w-3 h-3 text-blue-400" />
                             <span className="text-xs font-semibold text-slate-300">
-                                Financed for {house.finance_duration} Years
+                                Mortgage Duration {house.finance_duration} Years
                             </span>
                         </div>
                     )}
